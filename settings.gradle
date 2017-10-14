@@ -1,0 +1,3 @@
+rootProject.name = 'cloud'
+
+include 'basics', 'geolocation:admin', 'geolocation:queries', 'track', 'web'

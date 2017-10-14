@@ -1,0 +1,25 @@
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+allprojects {
+	buildscript {
+		ext {
+			springBootVersion = '2.0.0.M5'
+		}
+		repositories {
+			mavenCentral()
+			maven { url "https://repo.spring.io/snapshot" }
+			maven { url "https://repo.spring.io/milestone" }
+		}
+		dependencies {
+			classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		}
+	}
+
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+
+}
