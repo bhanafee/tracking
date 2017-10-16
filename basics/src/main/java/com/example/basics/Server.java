@@ -14,14 +14,16 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @SpringBootApplication
 public class Server {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SpringApplication.run(Server.class, args);
     }
 
     @Bean
     public RouterFunction<ServerResponse> routes() {
-        CountryHandler countries = new CountryHandler();
-        return route(GET("/countries/{code}"), countries :: getCountry);
+        Handlers handlers = new Handlers();
+        return route(GET("/countries/{code}"), handlers::getCountry)
+                .andRoute(GET("/currencies/{code}"), handlers::getCurrency)
+                .andRoute(GET("/languages/{code}"), handlers::getLanguage);
     }
 
 }
