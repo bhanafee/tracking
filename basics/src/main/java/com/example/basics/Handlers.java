@@ -5,6 +5,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -13,18 +16,21 @@ import static org.springframework.web.reactive.function.BodyInserters.fromObject
 @Component
 public class Handlers {
 
+    private static final Collection<Locale> AVAILABLE = Arrays.asList(Locale.getAvailableLocales());
+
     private String extractCode(ServerRequest request) {
         return request.pathVariable("code");
     }
 
     private Locale extractLocalization(ServerRequest request) {
-        // TODO: look for Accept-Language header
-        return Locale.getDefault(Locale.Category.DISPLAY);
+        final List<Locale.LanguageRange> requested = request.headers().acceptLanguage();
+        final Locale matched = Locale.lookup(requested, AVAILABLE);
+        return matched == null ? Locale.getDefault(Locale.Category.DISPLAY) : matched;
     }
 
-    private Mono<ServerResponse> respond(Object object) {
+    private <T> Mono<ServerResponse> respond(T info) {
         return Mono
-                .just(object)
+                .just(info)
                 .flatMap(i -> ServerResponse.ok().contentType(APPLICATION_JSON).body(fromObject(i)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
@@ -54,7 +60,6 @@ public class Handlers {
 
         return respond(currency);
     }
-
 
     public Mono<ServerResponse> getLanguage(ServerRequest request) {
         final Locale locale = extractLocalization(request);
