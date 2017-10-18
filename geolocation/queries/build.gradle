@@ -19,7 +19,15 @@ repositories {
 model {
     components {
         play {
-            platform play: '2.6.6', java: '1.8'
+            platform play: '2.6.6', java: '1.8', scala: '2.11'
         }
     }
 }
+//
+//tasks.withType(TwirlCompile) {
+//    doLast {
+//        fileTree(outputDirectory).files.each {
+//            GFileUtils.touch(it)
+//        }
+//    }
+//}
