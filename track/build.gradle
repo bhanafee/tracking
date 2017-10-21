@@ -3,8 +3,8 @@ apply plugin: 'scala'
 
 ext {
 	scalaLibVersion = '2.12'
-	scalaVersion = '2.12.3'
-	akkaVersion = '2.5.4'
+	scalaVersion = '2.12.4'
+	akkaVersion = '2.5.6'
 	akkaHttpVersion = '10.0.10'
 }
 
@@ -17,6 +17,9 @@ dependencies {
 	compile "com.typesafe.akka:akka-actor_$scalaLibVersion:$akkaVersion"
 	compile "com.typesafe.akka:akka-stream_$scalaLibVersion:$akkaVersion"
 	compile "com.typesafe.akka:akka-http_$scalaLibVersion:$akkaHttpVersion"
+	compile "com.typesafe.akka:akka-http-spray-json_$scalaLibVersion:$akkaHttpVersion"
+    runtime("ch.qos.logback:logback-classic:$logbackVersion")
+    runtime "com.typesafe.akka:akka-slf4j_$scalaLibVersion:$akkaVersion"
 }
 
 run {

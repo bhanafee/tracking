@@ -1,54 +1,89 @@
 package com.example.track
 
-import akka.actor.ActorSystem
-
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.{Directives, StandardRoute}
+import akka.pattern.ask
 import akka.stream.ActorMaterializer
+import akka.util.Timeout
+import com.example.track.Tracker._
+import com.typesafe.config.ConfigFactory
+import java.time.Instant
+import java.time.format.DateTimeFormatter.ISO_INSTANT
 
-object Main extends App {
-	implicit val system = ActorSystem("TrackSystem")
-	implicit val materializer = ActorMaterializer() 
+import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
 
-    // TODO: set up OpenTracing default NO-OP, configurable. Wrap every request as a span.
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
-    // anything for logger configuration?
-    // how to log access?
-    
-	// set up tracker(s) - by id? how to handle sharding?
-	// set up tagger - if URL configured. taggers may be *configured* as pool
+// TODO: Add OpenTracing
+object Main extends App with Directives {
+  implicit val system: ActorSystem = ActorSystem("TrackSystem")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-	val route =
-		// TODO: parse JSON POSTed requests { id, lon, lat, time? }
-    	pathPrefix("track") {
-    		pathEndOrSingleSlash {
-    			post {
-    				// TODO: Add timestamp if needed and tell tracker
-    				complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Can't parse JSON with id yet!</h1>"))
-    			} ~
-    			get {
-    				// TODO: Ask tracker
-    				complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Do you really want it all?</h1>"))
-    			}
-    		} ~
-      		path (Segment) { id =>
-      			pathEnd {
-      				get {
-      					// TODO: Ask tracker
- 	     				parameter('since) { since =>
-			        		complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, s"<h1>About $id since $since</h1>"))
-      					} ~
-			        	complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, s"<h1>Latest for $id</h1>"))
-     				} ~
- 	     			post {
- 	     				// TODO: Add timestamp if needed and tell tagger
-	    				complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Can't parse JSON for $id yet!</h1>"))
-	    			}
-     			}
- 	    	}
-		}
+  val config = ConfigFactory.load()
+  val host = config.getString("http.host")
+  val port = config.getInt("http.port")
 
-    // TODO: make address configurable, default to localhost and 80
-	val binding = Http().bindAndHandle(route, "localhost", 8080)
+  implicit val timeout: Timeout = Timeout(config.getInt("http.timeout").seconds)
+
+  val trackerProps = Props[Tracker]
+
+  val tracker: ActorRef = system.actorOf(trackerProps, "tracker")
+
+  case class Observation(longitude: Double, latitude: Double, elevation: Option[Float], id: Option[String], timestamp: Option[Instant], tags: Tag*)
+
+  // TODO: Provide unmarshaller for Observation
+  implicit val oum: FromRequestUnmarshaller[Observation] = null
+
+  val route =
+    pathPrefix("track") {
+      pathEndOrSingleSlash {
+        post {
+          entity(as[Observation])(handleObservation(_, None))
+        } ~ get {
+          handleQuery(None, None)
+        }
+      } ~ {
+        path(Segment) { id =>
+          pathEnd {
+            get {
+              parameter('since) { since => handleQuery(Some(id), Some(since))
+              } ~ get {
+                handleQuery(Some(id), None)
+              }
+            }
+          } ~ post {
+            entity(as[Observation])(handleObservation(_, Some(id)))
+          }
+        }
+      }
+    }
+
+  val binding = Http().bindAndHandle(route, host, port)
+
+  private def handleObservation(observation: Observation, path: Option[String]): StandardRoute = Try {
+    val id: String = observation.id.getOrElse(path.get)
+    val timestamp: Instant = observation.timestamp.getOrElse(Instant.now())
+    val position = Position(observation.longitude, observation.latitude, observation.elevation)
+    Waypoint(id, timestamp, Some(position), observation.tags: _*)
+  } match {
+    case Success(w) =>
+      tracker ! w
+      complete(StatusCodes.Accepted)
+    case Failure(e) => complete(StatusCodes.BadRequest)
+  }
+
+  private def handleQuery(id: Option[String], since: Option[String]): StandardRoute = Try {
+    since.map(s => Instant.from(ISO_INSTANT.parse(s)))
+  } match {
+    case Success(s) => complete {
+      // TODO: render as JSON rather than toString()
+      (tracker ? Query(id=id, since = s)).mapTo[Track].map(_.toString)
+    }
+    case Failure(e) => complete(StatusCodes.BadRequest)
+  }
+
 }
