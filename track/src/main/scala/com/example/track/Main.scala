@@ -33,7 +33,7 @@ object Main extends App with Directives {
 
   val tracker: ActorRef = system.actorOf(trackerProps, "tracker")
 
-  case class Observation(longitude: Double, latitude: Double, elevation: Option[Float], id: Option[String], timestamp: Option[Instant], tags: Tag*)
+  case class Observation(longitude: Double, latitude: Double, elevation: Option[Float], id: Option[String], timestamp: Option[Instant], tags: List[Tag])
 
   // TODO: Provide unmarshaller for Observation
   implicit val oum: FromRequestUnmarshaller[Observation] = null
@@ -68,7 +68,7 @@ object Main extends App with Directives {
     val id: String = observation.id.getOrElse(path.get)
     val timestamp: Instant = observation.timestamp.getOrElse(Instant.now())
     val position = Position(observation.longitude, observation.latitude, observation.elevation)
-    Waypoint(id, timestamp, Some(position), observation.tags: _*)
+    Waypoint(id, timestamp, Some(position), observation.tags)
   } match {
     case Success(w) =>
       tracker ! w
@@ -81,7 +81,7 @@ object Main extends App with Directives {
   } match {
     case Success(s) => complete {
       // TODO: render as JSON rather than toString()
-      (tracker ? Query(id=id, since = s)).mapTo[Track].map(_.toString)
+      (tracker ? Query(id=id, since = s, List())).mapTo[Track].map(_.toString)
     }
     case Failure(e) => complete(StatusCodes.BadRequest)
   }

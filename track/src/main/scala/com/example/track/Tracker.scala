@@ -16,13 +16,30 @@ object Tracker {
     require(elevation.forall(e => e >= -500.0 && e <= 9000.0), "Elevation out of range")
   }
 
-  case class Waypoint(id: String, timestamp: Instant, position: Option[Position], tags: Tag*) {
+  case class Waypoint(id: String, timestamp: Instant, position: Option[Position], tags: List[Tag]) {
     require(id.nonEmpty)
   }
 
-  case class Query(id: Option[String], since: Option[Instant], tags: Tag*)
+  object Waypoint {
+    def apply(id: String, timestamp: Instant, position: Position) = new Waypoint(id, timestamp, Some(position), List())
+
+    def apply(id: String, timestamp: Instant, tags: List[Tag]) = new Waypoint(id, timestamp, None, tags)
+  }
+
+  case class Query(id: Option[String], since: Option[Instant], tags: List[Tag])
+
+  object Query {
+    def apply(id: String, since: Instant) = new Query(Some(id), Some(since), List())
+
+    def apply(id: String) = new Query(Some(id), None, List())
+
+    def apply(since: Instant, tags: List[Tag]) = new Query(None, Some(since), tags)
+
+    def apply(since: Instant) = new Query(None, Some(since), List())
+  }
 
   case class Track(waypoints: Waypoint*)
+
 }
 
 import akka.actor.{Actor, ActorLogging}
@@ -30,28 +47,37 @@ import akka.event.LoggingReceive
 import Tracker.{Waypoint, Query, Track, Tag}
 
 class Tracker extends Actor with ActorLogging {
-  private var waypoints: Seq[Waypoint] = Seq.empty
+  var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
-    case Waypoint(id, timestamp, None, Seq()) =>
+    case Waypoint(_, _, None, List()) =>
       log.warning("Ignoring empty waypoint")
     case w: Waypoint =>
       waypoints = waypoints match {
-        case Seq() => Seq(w)
-        case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) => w +: waypoints
-        // TODO: partition and insert waypoints received out of time sequence
-        case ws => ???
+        case Seq() =>
+          log.debug(s"Accepting first waypoint $w")
+          Seq(w)
+        case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) =>
+          log.debug(s"Accepting additional waypoint $w")
+          w +: waypoints
+        case ws =>
+          log.debug(s"Accepting out of order waypoint $w")
+          // TODO: partition and insert waypoints received out of time sequence
+          ???
       }
 
-    case Query(Some(id), None, Seq()) =>
+    case Query(Some(id), None, List()) =>
+      log.debug(s"Querying latest for id $id")
       val latest = waypoints.find(_.id == id)
       sender() ! Track(latest.toSeq: _*)
-    case Query(qid, None, tags@_*) =>
+    case Query(qid, None, tags) =>
+      log.debug(s"Querying by id and tags")
       val latestMatch = waypoints
         .filter(idMatch(qid))
         .find(tagMatch(tags))
       sender() ! Track(latestMatch.toSeq: _*)
-    case Query(qid, Some(since), tags@_*) =>
+    case Query(qid, Some(since), tags) =>
+      log.debug(s"Querying by id and tags since $since")
       val matches = waypoints
         .filter(idMatch(qid))
         .takeWhile(_.timestamp.isAfter(since))
@@ -59,11 +85,11 @@ class Tracker extends Actor with ActorLogging {
       sender() ! Track(matches: _*)
   }
 
-  def idMatch(qid: Option[String]): Waypoint => Boolean = qid match {
+  private def idMatch(qid: Option[String]): Waypoint => Boolean = qid match {
     case Some(id) => _.id == id
     case None => _ => true
   }
 
   // TODO: write tagMatch function
-  def tagMatch(tags: Seq[Tag]): Waypoint => Boolean = _ => true
+  private def tagMatch(tags: Seq[Tag]): Waypoint => Boolean = _ => true
 }
