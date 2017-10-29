@@ -66,18 +66,15 @@ class Tracker extends Actor with ActorLogging {
           ???
       }
 
-    case Query(Some(id), None, List()) =>
-      log.debug(s"Querying latest for id $id")
-      val latest = waypoints.find(_.id == id)
-      sender() ! Track(latest.toSeq: _*)
     case Query(qid, None, tags) =>
-      log.debug(s"Querying by id and tags")
+      log.debug(s"Querying latest by id $qid and tags $tags")
       val latestMatch = waypoints
         .filter(idMatch(qid))
         .find(tagMatch(tags))
       sender() ! Track(latestMatch.toSeq: _*)
+
     case Query(qid, Some(since), tags) =>
-      log.debug(s"Querying by id and tags since $since")
+      log.debug(s"Querying by id $qid and tags $tags since $since")
       val matches = waypoints
         .filter(idMatch(qid))
         .takeWhile(_.timestamp.isAfter(since))

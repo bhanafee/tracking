@@ -11,7 +11,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.duration._
 
-class TestTracker extends TestKit(ActorSystem("TestSystem")) with WordSpecLike with Matchers with BeforeAndAfterAll {
+class TestTracker extends TestKit(ActorSystem("TestTracker")) with WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val timeout: Timeout = 2.seconds
 
   val Somewhere: Option[Position] = Some(Position(0.0, 0.0, None))

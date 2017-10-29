@@ -23,6 +23,7 @@ dependencies {
 	runtime "com.typesafe.akka:akka-slf4j_$scalaLibVersion:$akkaVersion"
     testCompile "org.scalatest:scalatest_$scalaLibVersion:$scalaTestVersion"
 	testCompile "com.typesafe.akka:akka-testkit_$scalaLibVersion:$akkaVersion"
+	testCompile "com.typesafe.akka:akka-http-testkit_$scalaLibVersion:$akkaHttpVersion"
 }
 
 run {
