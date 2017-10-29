@@ -11,50 +11,56 @@ public class BuiltIns {
 
     private static final Pattern Numeric = Pattern.compile("\\d{1,3}");
 
-    public static Optional<Country> findCountry(String code, Locale locale) {
-        Optional<Country> country = Optional.empty();
-        for (Locale c : AVAILABLE_LOCALES) {
-            try {
-                if (code.equalsIgnoreCase((c.getCountry()))) {
-                    country = Optional.of(new CountryFromJRE(c, locale));
-                    break;
+    public static LocalizedFind<Country> findCountry() {
+        return (code, locale) -> {
+            Optional<Country> country = Optional.empty();
+            for (Locale c : AVAILABLE_LOCALES) {
+                try {
+                    if (code.equalsIgnoreCase((c.getCountry()))) {
+                        country = Optional.of(new CountryFromJRE(c, locale));
+                        break;
+                    }
+                } catch (MissingResourceException e) {
+                    // EMPTY
                 }
-            } catch (MissingResourceException e) {
-                // EMPTY
-            }
-            try {
-                if (code.equalsIgnoreCase((c.getISO3Country()))) {
-                    country = Optional.of(new CountryFromJRE(c, locale));
-                    break;
+                try {
+                    if (code.equalsIgnoreCase((c.getISO3Country()))) {
+                        country = Optional.of(new CountryFromJRE(c, locale));
+                        break;
+                    }
+                } catch (MissingResourceException e) {
+                    // EMPTY
                 }
-            } catch (MissingResourceException e) {
-                // EMPTY
             }
-        }
-        return country;
+            return country;
+        };
     }
 
-    public static Optional<Currency> findCurrency(String code, Locale locale) {
-        Optional<Currency> currency = Optional.empty();
-        if (Numeric.matcher(code).matches()) {
-            int numeric = Integer.parseInt(code);
-            for (java.util.Currency c : AVAILABLE_CURRENCIES) {
-                if (c.getNumericCode() == numeric) {
-                    currency = Optional.of(new CurrencyFromJRE(c, locale));
-                    break;
+    public static LocalizedFind<Currency> findCurrency() {
+        return (code, locale) -> {
+            Optional<Currency> currency = Optional.empty();
+            if (Numeric.matcher(code).matches()) {
+                int numeric = Integer.parseInt(code);
+                for (java.util.Currency c : AVAILABLE_CURRENCIES) {
+                    if (c.getNumericCode() == numeric) {
+                        currency = Optional.of(new CurrencyFromJRE(c, locale));
+                        break;
+                    }
                 }
+            } else try {
+                currency = Optional.of(new CurrencyFromJRE(java.util.Currency.getInstance(code.toUpperCase(Locale.US)), locale));
+            } catch (final IllegalArgumentException e) {
+                // EMPTY
             }
-        } else try {
-            currency = Optional.of(new CurrencyFromJRE(java.util.Currency.getInstance(code.toUpperCase(Locale.US)), locale));
-        } catch (final IllegalArgumentException e) {
-            // EMPTY
-        }
-        return currency;
+            return currency;
+        };
     }
 
-    public static Optional<Language> findLanguage(String code, Locale locale) {
-        Locale byTag = Locale.forLanguageTag(code);
-        return Optional.ofNullable(byTag == null ? null : new LanguageFromJRE(byTag, locale));
+    public static LocalizedFind<Language> findLanguage() {
+        return (code, locale) -> {
+            Locale byTag = Locale.forLanguageTag(code);
+            return Optional.ofNullable(byTag == null ? null : new LanguageFromJRE(byTag, locale));
+        };
     }
 
     private static class CountryFromJRE implements Country {
