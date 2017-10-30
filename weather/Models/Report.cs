@@ -1,14 +1,12 @@
 ﻿namespace weather.Models
 {
-    public class Report
+    public interface IWeatherSource
     {
-        private readonly string _content;
-
-        public Report(string content)
-        {
-            _content = content;
-        }
-
-        public string Content => _content;
+        IWeatherReport fetch(int zip);
+    }
+    public interface IWeatherReport
+    {
+        int Zip { get; }
+        string Summary { get; }
     }
 }
