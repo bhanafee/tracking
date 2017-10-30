@@ -17,6 +17,7 @@ namespace weather
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<INoaaAuthentication>(new Dummy());
             services.AddTransient<IWeatherSource, Noaa>();
             services.AddMvc();
         }
@@ -30,5 +31,12 @@ namespace weather
 
             app.UseMvc();
         }
+    }
+
+    public class Dummy : INoaaAuthentication
+    {
+        public string Email => "ncsc-email";
+
+        public string Token => "ncsc-token";
     }
 }

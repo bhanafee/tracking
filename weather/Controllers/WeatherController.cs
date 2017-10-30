@@ -17,8 +17,7 @@ namespace weather.Controllers
         public string Get(int zip)
         {
             var report = _source.fetch(zip);
-            var response = string.Format("Weather for ZIP {0:d5} is {1}", report.Zip, report.Summary);
-            return response;
+            return report.Summary;
         }
     }
 }
