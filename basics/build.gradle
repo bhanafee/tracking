@@ -1,6 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
 
 sourceCompatibility = 1.9
 targetCompatibility = 1.9

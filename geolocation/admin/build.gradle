@@ -8,10 +8,12 @@ buildscript {
 	}
 }
 
-apply plugin: 'kotlin'
-apply plugin: 'kotlin-spring'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+plugins {
+	id 'kotlin'
+	id 'kotlin-spring'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
+}
 
 sourceCompatibility = 1.8
 compileKotlin {
