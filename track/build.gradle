@@ -1,6 +1,5 @@
 apply plugin: 'scala'
 apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 ext {
     scalaLibVersion = '2.12'
@@ -27,6 +26,4 @@ dependencies {
     testCompile "com.typesafe.akka:akka-http-testkit_$scalaLibVersion:$akkaHttpVersion"
 }
 
-run {
-    mainClassName = 'com.example.track.Main'
-}
+mainClassName = "com.example.track.Main"

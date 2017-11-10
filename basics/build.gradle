@@ -6,8 +6,9 @@ sourceCompatibility = 1.9
 targetCompatibility = 1.9
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-webflux')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('io.projectreactor:reactor-test')
+	compile("org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}")
+	compile("org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}")
+	compile("io.projectreactor:reactor-core:${reactorVersion}")
+	testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+	testCompile("io.projectreactor:reactor-test:${reactorVersion}")
 }
