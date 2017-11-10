@@ -1,9 +1,17 @@
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-
 plugins {
 	id 'idea'
+    id 'scala'
+    id 'application'
+    id 'play'
+    id "org.jetbrains.kotlin.jvm" version '1.1.51' apply false
+    id "org.jetbrains.kotlin.plugin.spring" version '1.1.51' apply false
+    id 'org.springframework.boot'  version '1.5.8.RELEASE' apply false
+    id 'io.spring.dependency-management' version '1.0.3.RELEASE' apply false
+    id 'com.github.johnrengelman.shadow' version '2.0.1' apply false
 }
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
 
 allprojects {
 	buildscript {
@@ -15,9 +23,6 @@ allprojects {
 			mavenCentral()
 			maven { url "https://repo.spring.io/snapshot" }
 			maven { url "https://repo.spring.io/milestone" }
-		}
-		dependencies {
-			classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		}
 	}
 

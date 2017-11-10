@@ -1,7 +1,4 @@
-
-plugins {
-    id 'play'
-}
+apply plugin: 'play'
 
 repositories {
     jcenter()
