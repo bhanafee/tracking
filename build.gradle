@@ -6,6 +6,7 @@ allprojects {
 		ext {
 			springBootVersion = '2.0.0.M6'
 			logbackVersion = '1.2.3'
+			slf4jVersion = '1.7.25'
 			reactorVersion = '3.1.1.RELEASE'
 		}
 		repositories {

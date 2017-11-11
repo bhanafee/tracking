@@ -15,6 +15,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromObject;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
@@ -23,6 +26,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @SpringBootApplication
 public class Server {
+
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     private static final MediaType JSON_UTF8 = new MediaType(APPLICATION_JSON, Charset.forName("UTF-8"));
 
@@ -49,6 +54,9 @@ public class Server {
             final String code = request.pathVariable("code");
 
             Optional<R> result = find.apply(code, locale);
+
+            logger.info("Request for {}", code);
+
             return result.isPresent()
                     ? Mono.just(result).flatMap((i -> ServerResponse.ok().contentType(JSON_UTF8).body(fromObject(i))))
                     : ServerResponse.notFound().build();

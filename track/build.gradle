@@ -14,16 +14,16 @@ repositories {
 }
 
 dependencies {
-    compile "org.scala-lang:scala-library:$scalaVersion"
-    compile "com.typesafe.akka:akka-actor_$scalaLibVersion:$akkaVersion"
-    compile "com.typesafe.akka:akka-stream_$scalaLibVersion:$akkaVersion"
-    compile "com.typesafe.akka:akka-http_$scalaLibVersion:$akkaHttpVersion"
-    compile "com.typesafe.akka:akka-http-spray-json_$scalaLibVersion:$akkaHttpVersion"
-    runtime "ch.qos.logback:logback-classic:$logbackVersion"
-    runtime "com.typesafe.akka:akka-slf4j_$scalaLibVersion:$akkaVersion"
-    testCompile "org.scalatest:scalatest_$scalaLibVersion:$scalaTestVersion"
-    testCompile "com.typesafe.akka:akka-testkit_$scalaLibVersion:$akkaVersion"
-    testCompile "com.typesafe.akka:akka-http-testkit_$scalaLibVersion:$akkaHttpVersion"
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile "com.typesafe.akka:akka-actor_${scalaLibVersion}:${akkaVersion}"
+    compile "com.typesafe.akka:akka-stream_${scalaLibVersion}:${akkaVersion}"
+    compile "com.typesafe.akka:akka-http_${scalaLibVersion}:${akkaHttpVersion}"
+    compile "com.typesafe.akka:akka-http-spray-json_${scalaLibVersion}:${akkaHttpVersion}"
+    runtime "ch.qos.logback:logback-classic:${logbackVersion}"
+    runtime "com.typesafe.akka:akka-slf4j_${scalaLibVersion}:${akkaVersion}"
+    testCompile "org.scalatest:scalatest_${scalaLibVersion}:$scalaTestVersion"
+    testCompile "com.typesafe.akka:akka-testkit_${scalaLibVersion}:${akkaVersion}"
+    testCompile "com.typesafe.akka:akka-http-testkit_${scalaLibVersion}:${akkaHttpVersion}"
 }
 
 mainClassName = "com.example.track.Main"
