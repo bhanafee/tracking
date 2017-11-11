@@ -1,18 +1,6 @@
 apply plugin: 'scala'
 apply plugin: 'application'
 
-ext {
-    scalaLibVersion = '2.12'
-    scalaVersion = '2.12.4'
-    akkaVersion = '2.5.6'
-    akkaHttpVersion = '10.0.10'
-    scalaTestVersion = '3.0.4'
-}
-
-repositories {
-    maven { url "http://repo.typesafe.com/typesafe/releases/" }
-}
-
 dependencies {
     compile(
             "org.scala-lang:scala-library:${scalaVersion}",

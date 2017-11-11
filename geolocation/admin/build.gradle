@@ -1,7 +1,4 @@
 buildscript {
-    ext {
-        kotlinVersion = '1.1.51'
-    }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
         classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
