@@ -1,11 +1,11 @@
 buildscript {
-	ext {
-		kotlinVersion = '1.1.51'
-	}
-	dependencies {
-		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-	}
+    ext {
+        kotlinVersion = '1.1.51'
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+    }
 }
 
 apply plugin: 'kotlin'
@@ -15,16 +15,18 @@ apply plugin: 'io.spring.dependency-management'
 
 sourceCompatibility = 1.8
 compileKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 dependencies {
-	compile "org.springframework.data:spring-data-rest-hal-browser"
-	compile "org.springframework.boot:spring-boot-starter"
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
-	compile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
-	testCompile "org.springframework.boot:spring-boot-starter-test"
+    compile(
+            "org.springframework.data:spring-data-rest-hal-browser",
+            "org.springframework.boot:spring-boot-starter",
+            "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}",
+            "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
+    )
+    testCompile "org.springframework.boot:spring-boot-starter-test"
 }

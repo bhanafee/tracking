@@ -6,11 +6,15 @@ sourceCompatibility = 1.9
 targetCompatibility = 1.9
 
 dependencies {
-	compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
-	compile "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
-	compile "io.projectreactor:reactor-core:${reactorVersion}"
-	compile "org.slf4j:slf4j-api:${slf4jVersion}"
-	runtime "ch.qos.logback:logback-classic:${logbackVersion}"
-	testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-	testCompile "io.projectreactor:reactor-test:${reactorVersion}"
+    compile(
+            "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}",
+            "io.projectreactor:reactor-core:${reactorVersion}",
+            "org.slf4j:slf4j-api:${slf4jVersion}"
+    )
+    runtime "ch.qos.logback:logback-classic:${logbackVersion}"
+    testCompile(
+            "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+            "io.projectreactor:reactor-test:${reactorVersion}"
+    )
 }
