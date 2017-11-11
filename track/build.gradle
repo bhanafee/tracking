@@ -1,5 +1,7 @@
-apply plugin: 'scala'
-apply plugin: 'application'
+plugins {
+    id 'scala'
+    id 'application'
+}
 
 dependencies {
     compile(
