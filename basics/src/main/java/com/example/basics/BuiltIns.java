@@ -3,14 +3,19 @@ package com.example.basics;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/** Implements Country, Currency and Language searches based on localization data found in the JRE. */
 public class BuiltIns {
 
+    /** Converts {@link Locale#getAvailableLocales()} to a {@link Collection}. */
     public static final Collection<Locale> AVAILABLE_LOCALES = Arrays.asList(Locale.getAvailableLocales());
 
+    /** Converts {@link java.util.Currency#getAvailableCurrencies()} to a {@link Collection}. */
     private static final Collection<java.util.Currency> AVAILABLE_CURRENCIES = java.util.Currency.getAvailableCurrencies();
 
+    /** Pattern for 1 to 3 digits. */
     private static final Pattern Numeric = Pattern.compile("\\d{1,3}");
 
+    /** Searches locales in the JRE for a country that has a matching 2 or 3 character code. */
     public static LocalizedFind<Country> findCountry() {
         return (code, locale) -> {
             Optional<Country> country = Optional.empty();
@@ -36,6 +41,7 @@ public class BuiltIns {
         };
     }
 
+    /** Searches currencies in the JRE for a currency that has a matching alpha or numeric code. */
     public static LocalizedFind<Currency> findCurrency() {
         return (code, locale) -> {
             Optional<Currency> currency = Optional.empty();
@@ -56,6 +62,7 @@ public class BuiltIns {
         };
     }
 
+    /** Searches locales in the JRE for a language that has a matching IETF BCP 47 tag based on RFC 4647 matching. */
     public static LocalizedFind<Language> findLanguage() {
         return (code, locale) -> {
             Locale byTag = Locale.forLanguageTag(code);

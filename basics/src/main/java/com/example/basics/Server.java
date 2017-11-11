@@ -23,7 +23,9 @@ import static org.springframework.web.reactive.function.BodyInserters.fromObject
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
-
+/**
+ * Main class for the application.
+ */
 @SpringBootApplication
 public class Server {
 
@@ -35,6 +37,11 @@ public class Server {
         SpringApplication.run(Server.class, args);
     }
 
+    /**
+     * Provides the routes for countries, currencies and languages.
+     *
+     * @return routes for the server
+     */
     @Bean
     public RouterFunction<ServerResponse> routes() {
         return route(GET("/countries/{code}"), this::getCountry)
