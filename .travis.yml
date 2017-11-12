@@ -9,4 +9,5 @@ branches:
     - master
 
 script:
-  - gradle clean test assemble
+  - gradle clean
+  - gradle test
