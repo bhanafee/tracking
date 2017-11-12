@@ -1,9 +1,12 @@
 os:
   - linux
 
+language:
+  - java
+
 branches:
   only:
     - master
 
 script:
-  - gradle clean
+  - gradle clean test assemble
