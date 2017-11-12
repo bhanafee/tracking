@@ -6,7 +6,7 @@ jdk: oraclejdk9
 
 branches:
   only:
-    - master
+    - travis-ci
 
 script:
   - gradle clean
