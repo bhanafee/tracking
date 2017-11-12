@@ -1,0 +1,13 @@
+os: linux
+
+language: java
+
+jdk: oraclejdk9
+
+branches:
+  only:
+    - master
+
+script:
+  - gradle clean
+  - gradle test
