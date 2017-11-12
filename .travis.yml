@@ -1,6 +1,6 @@
 os: linux
 
-language: java
+language: scala
 
 jdk: oraclejdk9
 
