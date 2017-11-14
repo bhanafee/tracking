@@ -1,5 +1,7 @@
 build
 out
+target
+logs
 *.iml
 *.ipr
 *.iws

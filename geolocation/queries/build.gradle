@@ -1,0 +1,11 @@
+plugins {
+    id: 'play'
+}
+
+model {
+    components {
+        play {
+            platform play: '2.6.7', scala: '2.12.4'
+        }
+    }
+}
