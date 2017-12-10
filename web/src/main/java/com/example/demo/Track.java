@@ -3,11 +3,11 @@ package com.example.demo;
 import io.opentracing.ActiveSpan;
 import io.opentracing.Tracer;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class Track {
 
     private final Logger log;
@@ -23,7 +23,7 @@ public class Track {
     public String show() {
         try (ActiveSpan span = tracer.buildSpan("show").startActive()) {
             log.info("Getting track");
-            return "welcome";
+            return "track";
         }
     }
 
@@ -31,7 +31,7 @@ public class Track {
     public String add() {
         try (ActiveSpan span = tracer.buildSpan("track").startActive()) {
             log.info("Showing track");
-            return "welcome";
+            return "track";
         }
     }
 }
