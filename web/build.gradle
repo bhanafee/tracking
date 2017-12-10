@@ -10,7 +10,10 @@ targetCompatibility = 1.8
 dependencies {
     compile(
             "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.boot:spring-boot-starter-thymeleaf",
+            "org.springframework.boot:spring-boot-starter-security",
             "org.springframework.boot:spring-boot-starter-actuator",
+            "org.springframework.boot:spring-boot-starter-hateoas",
             "org.slf4j:slf4j-api:${slf4jVersion}",
             "io.opentracing:opentracing-api:${opentracingVersion}",
             "io.opentracing:opentracing-util:${opentracingVersion}"
