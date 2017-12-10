@@ -11,7 +11,9 @@ dependencies {
     compile(
             "org.springframework.boot:spring-boot-starter-web",
             "org.springframework.boot:spring-boot-starter-actuator",
-            "org.slf4j:slf4j-api:${slf4jVersion}"
+            "org.slf4j:slf4j-api:${slf4jVersion}",
+            "io.opentracing:opentracing-api:${opentracingVersion}",
+            "io.opentracing:opentracing-util:${opentracingVersion}"
     )
     runtime "ch.qos.logback:logback-classic:${logbackVersion}"
     testCompile "org.springframework.boot:spring-boot-starter-test"
