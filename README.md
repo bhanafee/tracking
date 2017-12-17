@@ -10,10 +10,10 @@ Simple query service. It is a **Reactive Spring** service written in **Java 9** 
 Contains two modules:
 
 ### [Queries](geolocation/queries)
-Service that calculates which geographic areas cover a coordinate. It is a **Kotlin** application built on **Spring REST**, and accesses a **PostGIS** database.
+Service that calculates which geographic areas cover a coordinate. It is a **Java 8** application built on the **Play Framework**.
 
 ### [Administration](geolocation/administration)
-Loads data to the geolocation database. It is a **Java 8** application built on the **Play Framework**.
+Loads data to the geolocation database. It is a **Kotlin** application built on **Spring REST**, and accesses a **PostGIS** database.
 
 ## [Track](track)
 Tracks geographic observations over time. It is written in **Scala** and built on **Akka HTTP**.
