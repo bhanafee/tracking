@@ -4,10 +4,6 @@ language: java
 
 jdk: oraclejdk9
 
-branches:
-  only:
-    - travis-ci
-
 script:
   - ./gradlew wrapper --version
   - ./gradlew clean
