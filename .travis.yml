@@ -9,5 +9,5 @@ branches:
     - travis-ci
 
 script:
-  - gradle wrapper
+  - gradle wrapper --version
   - gradle clean
