@@ -6,6 +6,7 @@ task wrapper(type: Wrapper) {
 }
 
 allprojects {
+	apply plugin: 'project-report'
 	buildscript {
 		ext {
 			springBootVersion = '2.0.0.M7'
