@@ -10,4 +10,3 @@ branches:
 
 script:
   - gradle clean
-  - gradle test
