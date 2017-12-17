@@ -1,0 +1,11 @@
+build
+out
+target
+logs
+*.iml
+*.ipr
+*.iws
+.*
+!.gitignore
+!.dockerignore
+!.travis.yml
