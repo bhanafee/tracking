@@ -1,11 +1,16 @@
 plugins {
-    id: 'play'
+    id 'play'
+}
+
+dependencies {
+    play "com.typesafe.play:play-guice_${scalaLibVersion}:${playVersion}"
 }
 
 model {
     components {
         play {
-            platform play: '2.6.7', scala: '2.12.4'
+            platform play: "${playVersion}", scala: "${scalaLibVersion}", java: '1.8'
+            injectedRoutesGenerator = true
         }
     }
 }

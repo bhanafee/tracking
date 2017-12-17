@@ -18,6 +18,7 @@ allprojects {
 			scalaVersion = '2.12.4'
 			akkaVersion = '2.5.6'
 			akkaHttpVersion = '10.0.10'
+			playVersion = '2.6.7'
 			scalaTestVersion = '3.0.4'
 			kotlinVersion = '1.2.0'
 		}
