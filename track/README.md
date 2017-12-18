@@ -8,3 +8,12 @@ Tracks movement of known devices
 - Akka HTTP
 - Akka Logging
 - OpenTracing
+
+# Cloud environments
+
+## Docker
+
+```bash
+docker build track --tag tracking/track
+docker run -p 8080:8080 tracking/track
+```

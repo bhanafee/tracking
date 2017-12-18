@@ -11,3 +11,19 @@ Secured front end for access to the cloud services
 - Monitoring (Actuator)
 - Tracing
 - Security
+
+# Cloud environments
+
+## Docker
+
+```bash
+docker build web --tag tracking/web
+docker run -p 8080:8080 tracking/web
+```
+
+The default user is `user`. Find the generated password GUID on the console output:
+
+```
+Using default security password: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
