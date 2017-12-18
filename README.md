@@ -12,7 +12,7 @@ Contains two modules:
 ### [Queries](geolocation/queries)
 Service that calculates which geographic areas cover a coordinate. It is a **Java 8** application built on the **Play Framework**.
 
-### [Administration](geolocation/administration)
+### [Administration](geolocation/admin)
 Loads data to the geolocation database. It is a **Kotlin** application built on **Spring REST**, and accesses a **PostGIS** database.
 
 ## [Track](track)
