@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,10 @@ namespace weather
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<INoaaAuthentication>(new Dummy());
+            services.AddSingleton<INoaaAuthentication>(new Authn(
+                Configuration["Noaa:Email"],
+                Configuration["Noaa:Token"]
+            ));
             services.AddTransient<IWeatherSource, Noaa>();
             services.AddMvc();
         }
@@ -33,10 +37,24 @@ namespace weather
         }
     }
 
-    public class Dummy : INoaaAuthentication
+    public class Authn : INoaaAuthentication
     {
-        public string Email => "ncsc-email";
+        public Authn(string email, string token)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException("NOAA email missing", nameof(email));
+            }
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentException("NOAA token missing", nameof(token));
+            }
+            Email = email;
+            Token = token;
+        }
 
-        public string Token => "ncsc-token";
+        public string Email { get; }
+
+        public string Token { get; }
     }
 }
