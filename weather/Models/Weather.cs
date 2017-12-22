@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace weather.Models
 {
@@ -29,10 +32,20 @@ namespace weather.Models
         
         private Endpoint Endpoint { get; }
 
-        public Report Fetch(int zip)
+        public Report ByZip(int zip)
         {
-            var summary = string.Format("For {0:d5} the weather is sunny", zip);
-            return new Report(zip, summary);
+            var raw = Fetcher(zip);
+            return new Report(zip, raw.Result);
+        }
+
+        private async Task<string> Fetcher(int zip)
+        {
+            var client = new HttpClient(); 
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("text/html"));
+            var uri = new Uri(string.Format(Endpoint.Url, Endpoint.Identifier, Endpoint.Key, zip));
+            return await client.GetStringAsync(uri);
         }
 
         public class Report 

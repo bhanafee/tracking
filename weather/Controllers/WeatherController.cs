@@ -16,7 +16,7 @@ namespace weather.Controllers
         [HttpGet("{zip}")]
         public string Get(int zip)
         {
-            var report = Source.Fetch(zip);
+            var report = Source.ByZip(zip);
             return report.Summary;
         }
     }
