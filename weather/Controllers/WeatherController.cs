@@ -6,17 +6,17 @@ namespace weather.Controllers
     [Route("api/[controller]")]
     public class WeatherController : Controller
     {
-        public WeatherController(Weather source)
+        public WeatherController(Weather service)
         {
-            Source = source;
+            Service = service;
         }
         
-        private Weather Source { get; }
+        private Weather Service { get; }
 
         [HttpGet("{zip}")]
         public string Get(int zip)
         {
-            var report = Source.ByZip(zip);
+            var report = Service.ByZip(zip);
             return report.Summary;
         }
     }

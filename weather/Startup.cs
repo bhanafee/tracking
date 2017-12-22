@@ -22,7 +22,7 @@ namespace weather
                 Configuration["Weather:Identifier"],
                 Configuration["Weather:Key"]
             ));
-            services.AddSingleton<Weather>();
+            services.AddTransient<Weather, OpenWeatherMap>();
             services.AddMvc();
         }
 
