@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -21,17 +22,6 @@ namespace weather.Models
 
         public abstract IReport ByZip(int zip);
 
-        protected async Task<string> Fetcher(Uri uri)
-        {
-            var client = BuildHttpClient();
-            return await client.GetStringAsync(uri);
-        }
-
-        protected UriBuilder BuildUri()
-        {
-            return new UriBuilder(string.Format(Source.Url, Source.Identifier, Source.Key));
-        }
-
         protected HttpClient BuildHttpClient()
         {
             var client = new HttpClient();
@@ -39,6 +29,17 @@ namespace weather.Models
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
             return client;
+        }
+
+        protected UriBuilder BuildUri()
+        {
+            return new UriBuilder(string.Format(Source.Url, Source.Identifier, Source.Key));
+        }
+
+        protected async Task<Stream> Fetch(Uri uri)
+        {
+            var client = BuildHttpClient();
+            return await client.GetStreamAsync(uri);
         }
     }
 }
