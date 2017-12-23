@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace weather.Models
+﻿namespace weather.Models
 {
     public class OpenWeatherMap : Weather
     {
@@ -10,8 +8,10 @@ namespace weather.Models
 
         public override IReport ByZip(int zip)
         {
-            var uri = new Uri(string.Format(Source.Url, Source.Identifier, Source.Key, zip));
-            var raw = Fetcher(uri);
+            var baseUri = BuildUri();
+            // Don't worry about empty query string, because OpenWeatherMap requires APPID parameter in the base URI.
+            baseUri.Query = baseUri.Query.Substring(1) + string.Format("&zip={0:00000},us", zip);
+            var raw = Fetcher(baseUri.Uri);
             return new Report(raw.Result);
         }
 

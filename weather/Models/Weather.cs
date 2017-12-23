@@ -27,6 +27,11 @@ namespace weather.Models
             return await client.GetStringAsync(uri);
         }
 
+        protected UriBuilder BuildUri()
+        {
+            return new UriBuilder(string.Format(Source.Url, Source.Identifier, Source.Key));
+        }
+
         protected HttpClient BuildHttpClient()
         {
             var client = new HttpClient();
