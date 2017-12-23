@@ -10,7 +10,8 @@ namespace weather.Models
 
         public override IReport ByZip(int zip)
         {
-            var raw = Fetcher(new Uri(string.Format(Source.Url, Source.Identifier, Source.Key, zip)));
+            var uri = new Uri(string.Format(Source.Url, Source.Identifier, Source.Key, zip));
+            var raw = Fetcher(uri);
             return new Report(raw.Result);
         }
 

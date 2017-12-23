@@ -23,12 +23,17 @@ namespace weather.Models
 
         protected async Task<string> Fetcher(Uri uri)
         {
-            var client = new HttpClient(); 
+            var client = BuildHttpClient();
+            return await client.GetStringAsync(uri);
+        }
+
+        protected HttpClient BuildHttpClient()
+        {
+            var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
-            return await client.GetStringAsync(uri);
+            return client;
         }
-        
     }
 }
