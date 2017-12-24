@@ -13,8 +13,15 @@ namespace weather.Controllers
         
         private Weather Service { get; }
 
+        [HttpGet]
+        public string Coordinates([FromQuery] float lon, [FromQuery]float lat)
+        {
+            var report = Service.ByCoordinates(lon, lat);
+            return report.Summary;
+        }
+        
         [HttpGet("{zip}")]
-        public string Get(int zip)
+        public string Zip(int zip)
         {
             var report = Service.ByZip(zip);
             return report.Summary;

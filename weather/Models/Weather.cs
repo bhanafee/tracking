@@ -22,6 +22,8 @@ namespace weather.Models
 
         public abstract IReport ByZip(int zip);
 
+        public abstract IReport ByCoordinates(float lon, float lat);
+
         protected HttpClient BuildHttpClient()
         {
             var client = new HttpClient();
