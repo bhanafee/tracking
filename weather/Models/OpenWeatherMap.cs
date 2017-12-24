@@ -12,14 +12,24 @@ namespace weather.Models
         {
         }
 
-        public override IReport ByZip(int zip)
+        // Generic OpenWeatherMap query and deserialization
+        private Report Query(string parameters)
         {
             var builder = BuildUri();
-            // Don't worry about empty query string, because OpenWeatherMap requires APPID parameter in the base URI.
-            builder.Query = builder.Query.Substring(1) + string.Format("&zip={0:00000},us", zip);
+            builder.Query = builder.Query.Substring(1) + parameters;
             var serializer = new DataContractJsonSerializer(typeof(Report));
             var stream = Fetch(builder.Uri).Result;
             return serializer.ReadObject(stream) as Report;
+        }
+
+        public override IReport ByZip(int zip)
+        {
+            return Query(string.Format("&zip={0:00000},us", zip));
+        }
+
+        public override IReport ByCoordinates(float lon, float lat)
+        {
+            return Query(string.Format("&lat={0}&lon={1}", lat, lon));
         }
 
         [DataContract]
