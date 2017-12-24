@@ -6,6 +6,15 @@ Proxies and transforms external weather service data
 
 - .NET Core
 
+# Usage
+
+
+## By ZIP code (U.S. only)
+
+```http://localhost//api/weather/XXXXX```
+
+## By longitude and latitude
+```http://localhost//api/weather?lat=XX.XXXX&lon=XX.XXXX```
 
 # Cloud environments
 
