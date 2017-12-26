@@ -1,5 +1,12 @@
 package com.example.basics;
 
+import io.opentracing.ActiveSpan;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMap;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,9 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -49,9 +54,18 @@ public class Server {
                 .andRoute(GET("/languages/{code}"), this::getLanguage);
     }
 
+    @Bean
+    public Tracer tracer() {
+        return GlobalTracer.get();
+    }
 
-    private <R> Function<ServerRequest, Mono<ServerResponse>> get(LocalizedFind<R> find) {
+    private <R> Function<ServerRequest, Mono<ServerResponse>> get(LocalizedFind<R> find, String operation) {
+        if (find == null) throw new NullPointerException("Missing find function");
+        if (operation == null || operation.isEmpty()) throw new IllegalArgumentException("Missing operation name");
+
         return (request) -> {
+            final ActiveSpan span = span(request, operation);
+
             // Extract preferred Locale from headers, falling back to platform default
             final List<Locale.LanguageRange> requested = request.headers().acceptLanguage();
             final Locale matched = Locale.lookup(requested, BuiltIns.AVAILABLE_LOCALES);
@@ -62,23 +76,50 @@ public class Server {
 
             Optional<R> result = find.apply(code, locale);
 
-            logger.info("Request for {}", code);
+            logger.info("Request for {} code '{}'", operation, code);
 
-            return result.isPresent()
+            final Mono<ServerResponse> response = result.isPresent()
                     ? Mono.just(result).flatMap((i -> ServerResponse.ok().contentType(JSON_UTF8).body(fromObject(i))))
                     : ServerResponse.notFound().build();
+
+            return span == null ? response : response.doOnTerminate(span::deactivate);
         };
     }
 
     private Mono<ServerResponse> getCountry(ServerRequest request) {
-        return get(BuiltIns.findCountry()).apply(request);
+        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findCountry(), "country");
+        return fn.apply(request);
     }
 
     private Mono<ServerResponse> getCurrency(ServerRequest request) {
-        return get(BuiltIns.findCurrency()).apply(request);
+        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findCurrency(), "currency");
+        return fn.apply(request);
     }
 
     private Mono<ServerResponse> getLanguage(ServerRequest request) {
-        return get(BuiltIns.findLanguage()).apply(request);
+        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(), "language");
+        return fn.apply(request);
+    }
+
+    private ActiveSpan span(ServerRequest request, String operation) {
+        final SpanContext ctx = tracer().extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
+
+            @Override
+            public Iterator<Map.Entry<String, String>> iterator() {
+                return request.headers().asHttpHeaders().toSingleValueMap().entrySet().iterator();
+            }
+
+            @Override
+            public void put(String key, String value) {
+                throw new UnsupportedOperationException("Cannot put headers into immutable request");
+            }
+        });
+
+        logger.info(ctx == null ? "No trace context" : "Found trace context");
+
+        return tracer().buildSpan(operation)
+                .asChildOf(ctx)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
+                .startActive();
     }
 }

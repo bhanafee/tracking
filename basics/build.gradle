@@ -14,6 +14,7 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-actuator",
             "org.springframework.boot:spring-boot-starter-webflux",
             "io.projectreactor:reactor-core:${reactorVersion}",
+            "io.opentracing:opentracing-util:${opentracingVersion}",
             "org.slf4j:slf4j-api:${slf4jVersion}"
     )
     runtime "ch.qos.logback:logback-classic:${logbackVersion}"
