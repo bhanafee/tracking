@@ -34,9 +34,11 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @SpringBootApplication
 public class Server {
 
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
-
     private static final MediaType JSON_UTF8 = new MediaType(APPLICATION_JSON, Charset.forName("UTF-8"));
+
+    private Logger logger = LoggerFactory.getLogger(Server.class);
+
+    private Tracer tracer = GlobalTracer.get();
 
     public static void main(String[] args) {
         SpringApplication.run(Server.class, args);
@@ -54,14 +56,9 @@ public class Server {
                 .andRoute(GET("/languages/{code}"), this::getLanguage);
     }
 
-    @Bean
-    public Tracer tracer() {
-        return GlobalTracer.get();
-    }
-
     private <R> Function<ServerRequest, Mono<ServerResponse>> get(LocalizedFind<R> find, String operation) {
         if (find == null) throw new NullPointerException("Missing find function");
-        if (operation == null || operation.isEmpty()) throw new IllegalArgumentException("Missing operation name");
+        if (operation == null || operation.isEmpty()) throw new IllegalArgumentException("Mission trace operation");
 
         return (request) -> {
             final ActiveSpan span = span(request, operation);
@@ -97,13 +94,18 @@ public class Server {
     }
 
     private Mono<ServerResponse> getLanguage(ServerRequest request) {
-        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(), "language");
+        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(),"language");
         return fn.apply(request);
     }
 
-    private ActiveSpan span(ServerRequest request, String operation) {
-        final SpanContext ctx = tracer().extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
-
+    /**
+     * Extracts the context from the server request, if there is one, and creates a new child span.
+     * @param request the incoming server request.
+     * @param operation the operation to assign to the new span.
+     * @return a new child span.
+     */
+    private ActiveSpan span(final ServerRequest request, final String operation) {
+        final SpanContext ctx = this.tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
             @Override
             public Iterator<Map.Entry<String, String>> iterator() {
                 return request.headers().asHttpHeaders().toSingleValueMap().entrySet().iterator();
@@ -112,12 +114,11 @@ public class Server {
             @Override
             public void put(String key, String value) {
                 throw new UnsupportedOperationException("Cannot put headers into immutable request");
+
             }
         });
 
-        logger.info(ctx == null ? "No trace context" : "Found trace context");
-
-        return tracer().buildSpan(operation)
+        return this.tracer.buildSpan(operation)
                 .asChildOf(ctx)
                 .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
                 .startActive();
