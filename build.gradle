@@ -13,6 +13,7 @@ allprojects {
             akkaVersion = '2.5.6'
             kotlinVersion = '1.2.0'
             logbackVersion = '1.2.3'
+            lombokVersion = '1.16.16'
             okHttp3Version = '2.2.2'
             opentracingBraveVersion = '0.24.0'
             opentracingVersion = '0.31.0-RC2'

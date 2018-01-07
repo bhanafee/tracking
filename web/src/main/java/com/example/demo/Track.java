@@ -2,22 +2,18 @@ package com.example.demo;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@Slf4j
+@RequiredArgsConstructor
 public class Track {
 
-    private final Logger log;
-
     private final Tracer tracer;
-
-    public Track(final Logger log, final Tracer tracer) {
-        this.log = log;
-        this.tracer = tracer;
-    }
 
     @GetMapping("/track")
     public String show() {

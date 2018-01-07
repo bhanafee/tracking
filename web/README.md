@@ -5,6 +5,7 @@ Secured front end for access to the cloud services
 ## Technologies
 
 - Spring application
+- Lombok
 - Tomcat
 - WebMVC
 - Logging

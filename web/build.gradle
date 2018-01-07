@@ -14,6 +14,7 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-security",
             "org.springframework.boot:spring-boot-starter-actuator",
             "org.springframework.boot:spring-boot-starter-hateoas",
+            "org.projectlombok:lombok:${lombokVersion}",
             "org.slf4j:slf4j-api:${slf4jVersion}",
             "io.opentracing:opentracing-api:${opentracingVersion}",
             "io.opentracing:opentracing-util:${opentracingVersion}"
