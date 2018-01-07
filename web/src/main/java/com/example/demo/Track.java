@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -21,17 +21,17 @@ public class Track {
 
     @GetMapping("/track")
     public String show() {
-        try (ActiveSpan span = tracer.buildSpan("show").startActive()) {
-            log.info("Getting track");
-            return "track";
-        }
+        final Span span = tracer.buildSpan("show").start();
+        log.info("Getting track");
+        span.finish();
+        return "track";
     }
 
     @PostMapping("/track")
     public String add() {
-        try (ActiveSpan span = tracer.buildSpan("track").startActive()) {
-            log.info("Showing track");
-            return "track";
-        }
+        final Span span = tracer.buildSpan("track").start();
+        log.info("Showing track");
+        span.finish();
+        return "track";
     }
 }

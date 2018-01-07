@@ -1,12 +1,10 @@
 package com.example.basics;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format;
-import io.opentracing.propagation.TextMap;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +15,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromObject;
@@ -36,12 +33,22 @@ public class Server {
 
     private static final MediaType JSON_UTF8 = new MediaType(APPLICATION_JSON, Charset.forName("UTF-8"));
 
-    private Logger logger = LoggerFactory.getLogger(Server.class);
+    private Logger log = LoggerFactory.getLogger(Server.class);
 
-    private Tracer tracer = GlobalTracer.get();
+    private Tracing tracing;
 
     public static void main(String[] args) {
         SpringApplication.run(Server.class, args);
+    }
+
+    /**
+     * Allows tracing to be configured.
+     *
+     * @param tracing the tracing configuration
+     */
+    @Autowired(required = false)
+    public void setTracing(final Tracing tracing) {
+        this.tracing = tracing;
     }
 
     /**
@@ -58,10 +65,11 @@ public class Server {
 
     private <R> Function<ServerRequest, Mono<ServerResponse>> get(LocalizedFind<R> find, String operation) {
         if (find == null) throw new NullPointerException("Missing find function");
-        if (operation == null || operation.isEmpty()) throw new IllegalArgumentException("Mission trace operation");
+        if (operation == null || operation.isEmpty()) throw new IllegalArgumentException("Missing trace operation");
 
         return (request) -> {
-            final ActiveSpan span = span(request, operation);
+            final Span span = this.tracing == null ? null : this.tracing.span(request, operation);
+            log.info("span {}started for {}", span == null ? "not " : "", operation);
 
             // Extract preferred Locale from headers, falling back to platform default
             final List<Locale.LanguageRange> requested = request.headers().acceptLanguage();
@@ -73,13 +81,13 @@ public class Server {
 
             Optional<R> result = find.apply(code, locale);
 
-            logger.info("Request for {} code '{}'", operation, code);
+            log.info("Request for {} code '{}'", operation, code);
 
             final Mono<ServerResponse> response = result.isPresent()
                     ? Mono.just(result).flatMap((i -> ServerResponse.ok().contentType(JSON_UTF8).body(fromObject(i))))
                     : ServerResponse.notFound().build();
 
-            return span == null ? response : response.doOnTerminate(span::deactivate);
+            return span == null ? response : response.doOnTerminate(span::finish);
         };
     }
 
@@ -94,33 +102,8 @@ public class Server {
     }
 
     private Mono<ServerResponse> getLanguage(ServerRequest request) {
-        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(),"language");
+        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(), "language");
         return fn.apply(request);
     }
 
-    /**
-     * Extracts the context from the server request, if there is one, and creates a new child span.
-     * @param request the incoming server request.
-     * @param operation the operation to assign to the new span.
-     * @return a new child span.
-     */
-    private ActiveSpan span(final ServerRequest request, final String operation) {
-        final SpanContext ctx = this.tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
-            @Override
-            public Iterator<Map.Entry<String, String>> iterator() {
-                return request.headers().asHttpHeaders().toSingleValueMap().entrySet().iterator();
-            }
-
-            @Override
-            public void put(String key, String value) {
-                throw new UnsupportedOperationException("Cannot put headers into immutable request");
-
-            }
-        });
-
-        return this.tracer.buildSpan(operation)
-                .asChildOf(ctx)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .startActive();
-    }
 }
