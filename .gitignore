@@ -1,6 +1,7 @@
 build
 out
 target
+lib
 logs
 *.iml
 *.ipr
