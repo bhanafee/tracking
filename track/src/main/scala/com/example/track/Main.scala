@@ -6,10 +6,8 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-// TODO: Add OpenTracing
 object Main extends App {
   val config = ConfigFactory.load()
   val host = config.getString("http.host")

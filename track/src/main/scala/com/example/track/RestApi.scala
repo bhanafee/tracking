@@ -1,7 +1,6 @@
 package com.example.track
 
 import java.time.Instant
-import java.time.format.DateTimeFormatter.ISO_INSTANT
 
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
@@ -22,7 +21,7 @@ class RestApi(tracker: ActorRef) extends Directives {
 
   // TODO: Provide unmarshaller for Observation
   implicit val oum: FromRequestUnmarshaller[Observation] = new FromRequestUnmarshaller[Observation]() {
-    override def apply(value: HttpRequest)(implicit ec: ExecutionContext, materializer: Materializer) =
+    override def apply(value: HttpRequest)(implicit ec: ExecutionContext, materializer: Materializer): Future[Observation] =
       Future.successful(Observation(0.0, 0.0, None, Some("bogus"), None, List()))
   }
 
