@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     compile(
+            project (":opentracing-akka"),
             "org.scala-lang:scala-library:${scalaVersion}",
             "com.typesafe.akka:akka-actor_${scalaLibVersion}:${akkaVersion}",
             "com.typesafe.akka:akka-stream_${scalaLibVersion}:${akkaVersion}",
