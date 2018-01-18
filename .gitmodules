@@ -1,3 +1,5 @@
 [submodule "opentracing-akka"]
 	path = opentracing-akka
 	url = https://github.com/bhanafee/opentracing-akka.git
+[opentracing-akka "opentracing.akka"]
+	branch = gradle
