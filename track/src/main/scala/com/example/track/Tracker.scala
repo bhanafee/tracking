@@ -2,6 +2,9 @@ package com.example.track
 
 import java.time.Instant
 
+import io.opentracing.Tracer
+import io.opentracing.contrib.akka.Spanned
+
 object Tracker {
   type Longitude = Double
   type Latitude = Double
@@ -46,7 +49,9 @@ import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingReceive
 import Tracker.{Waypoint, Query, Track, Tag}
 
-class Tracker extends Actor with ActorLogging {
+class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
+  override def operation(): String = self.path.name
+
   var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
