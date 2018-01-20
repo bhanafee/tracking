@@ -12,7 +12,7 @@ dependencies {
             "com.typesafe.akka:akka-http_${scalaLibVersion}:${akkaHttpVersion}",
             "com.typesafe.akka:akka-http-spray-json_${scalaLibVersion}:${akkaHttpVersion}",
             "io.opentracing:opentracing-util:${opentracingVersion}",
-            "io.zipkin.reporter2:zipkin-sender-okhttp3:${okHttp3Version}",
+            "io.zipkin.reporter2:zipkin-sender-okhttp3:${zipkinReporterVersion}",
             "io.opentracing.brave:brave-opentracing:${opentracingBraveVersion}"
     )
     runtime(

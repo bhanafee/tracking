@@ -18,7 +18,7 @@ dependencies {
             "org.slf4j:slf4j-api:${slf4jVersion}",
             "io.opentracing:opentracing-util:${opentracingVersion}",
             "io.opentracing.brave:brave-opentracing:${opentracingBraveVersion}",
-            "io.zipkin.reporter2:zipkin-sender-okhttp3:${okHttp3Version}"
+            "io.zipkin.reporter2:zipkin-sender-okhttp3:${zipkinReporterVersion}"
     )
     runtime "ch.qos.logback:logback-classic:${logbackVersion}"
     testCompile "org.springframework.boot:spring-boot-starter-test"
