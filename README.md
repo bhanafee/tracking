@@ -20,3 +20,6 @@ Tracks geographic observations over time. It is written in **Scala** and built o
 
 ## [Weather](weather)
 Proxies an external service to get weather reports for specific locations. It is written in **C#** and runs on **.NET Core**
+
+
+![Component overview](overview.svg)
