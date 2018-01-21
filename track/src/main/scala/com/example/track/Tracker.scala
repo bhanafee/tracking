@@ -3,7 +3,7 @@ package com.example.track
 import java.time.Instant
 
 import io.opentracing.Tracer
-import io.opentracing.contrib.akka.Spanned
+import io.opentracing.contrib.akka.{Spanned, TracingReceive}
 
 object Tracker {
   type Longitude = Double
@@ -55,36 +55,38 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
-    case Waypoint(_, _, None, List()) =>
-      log.warning("Ignoring empty waypoint")
-    case w: Waypoint =>
-      waypoints = waypoints match {
-        case Seq() =>
-          log.debug(s"Accepting first waypoint $w")
-          Seq(w)
-        case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) =>
-          log.debug(s"Accepting additional waypoint $w")
-          w +: waypoints
-        case ws =>
-          log.debug(s"Accepting out of order waypoint $w")
-          // TODO: partition and insert waypoints received out of time sequence
-          ???
-      }
+    TracingReceive(this, self) {
+      case Waypoint(_, _, None, List()) =>
+        log.warning("Ignoring empty waypoint")
+      case w: Waypoint =>
+        waypoints = waypoints match {
+          case Seq() =>
+            log.debug(s"Accepting first waypoint $w")
+            Seq(w)
+          case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) =>
+            log.debug(s"Accepting additional waypoint $w")
+            w +: waypoints
+          case ws =>
+            log.debug(s"Accepting out of order waypoint $w")
+            // TODO: partition and insert waypoints received out of time sequence
+            ???
+        }
 
-    case Query(qid, None, tags) =>
-      log.debug(s"Querying latest by id $qid and tags $tags")
-      val latestMatch = waypoints
-        .filter(idMatch(qid))
-        .find(tagMatch(tags))
-      sender() ! Track(latestMatch.toSeq: _*)
+      case Query(qid, None, tags) =>
+        log.debug(s"Querying latest by id $qid and tags $tags")
+        val latestMatch = waypoints
+          .filter(idMatch(qid))
+          .find(tagMatch(tags))
+        sender() ! Track(latestMatch.toSeq: _*)
 
-    case Query(qid, Some(since), tags) =>
-      log.debug(s"Querying by id $qid and tags $tags since $since")
-      val matches = waypoints
-        .filter(idMatch(qid))
-        .takeWhile(_.timestamp.isAfter(since))
-        .filter(tagMatch(tags))
-      sender() ! Track(matches: _*)
+      case Query(qid, Some(since), tags) =>
+        log.debug(s"Querying by id $qid and tags $tags since $since")
+        val matches = waypoints
+          .filter(idMatch(qid))
+          .takeWhile(_.timestamp.isAfter(since))
+          .filter(tagMatch(tags))
+        sender() ! Track(matches: _*)
+    }
   }
 
   private def idMatch(qid: Option[String]): Waypoint => Boolean = qid match {
