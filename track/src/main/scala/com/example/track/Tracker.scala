@@ -2,8 +2,9 @@ package com.example.track
 
 import java.time.Instant
 
-import io.opentracing.Tracer
-import io.opentracing.contrib.akka.{Spanned, TracingReceive}
+import io.opentracing.{Span, Tracer}
+import io.opentracing.contrib.akka.{Spanned, Spanning, TextMapCarrier, TracingReceive}
+import io.opentracing.contrib.akka.TextMapCarrier.{Payload, Traceable}
 
 object Tracker {
   type Longitude = Double
@@ -42,6 +43,7 @@ object Tracker {
   }
 
   case class Track(waypoints: Waypoint*)
+                  (val trace: Payload) extends Traceable
 
 }
 
@@ -77,7 +79,8 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
         val latestMatch = waypoints
           .filter(idMatch(qid))
           .find(tagMatch(tags))
-        sender() ! Track(latestMatch.toSeq: _*)
+          .toSeq
+        sendTrack(latestMatch)
 
       case Query(qid, Some(since), tags) =>
         log.debug(s"Querying by id $qid and tags $tags since $since")
@@ -85,7 +88,7 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
           .filter(idMatch(qid))
           .takeWhile(_.timestamp.isAfter(since))
           .filter(tagMatch(tags))
-        sender() ! Track(matches: _*)
+        sendTrack(matches)
     }
   }
 
@@ -96,4 +99,13 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
 
   // TODO: write tagMatch function
   private def tagMatch(tags: Seq[Tag]): Waypoint => Boolean = _ => true
+
+  private def sendTrack(waypoints: Seq[Waypoint]): Unit = {
+    // TODO: Write a cleaner abstraction
+    val track: Payload => Track = Track(waypoints: _*)
+    val child: Span = Spanning(tracer, track, Spanning.messageClassIsOperation, Spanning.akkaProducer(span): _*)
+    val p: Payload = TextMapCarrier.inject(tracer, child.context())
+    sender() ! track(p)
+    child.finish()
+  }
 }
