@@ -105,7 +105,7 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   private def sendTrack(waypoints: Seq[Waypoint]): Unit = {
     // TODO: Write a cleaner abstraction
     val track: Payload => Track = Track(waypoints: _*)
-    val child: Span = Spanning(tracer, track, Spanning.messageClassIsOperation, Spanning.akkaProducer(span): _*)
+    val child: Span = Spanning(tracer, "Track", track, Spanning.akkaProducer(span): _*)
     sender() ! track(child.context())
     child.finish()
   }
