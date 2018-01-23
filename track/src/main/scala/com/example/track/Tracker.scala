@@ -2,7 +2,7 @@ package com.example.track
 
 import java.time.Instant
 
-import io.opentracing.{Span, Tracer}
+import io.opentracing.{Span, SpanContext, Tracer}
 import io.opentracing.contrib.akka.{Spanned, Spanning, TextMapCarrier, TracingReceive}
 import io.opentracing.contrib.akka.TextMapCarrier.{Payload, Traceable}
 
@@ -54,6 +54,8 @@ import Tracker.{Waypoint, Query, Track, Tag}
 class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   override def operation(): String = self.path.name
 
+  implicit val spanContext2payload: SpanContext => Payload = TextMapCarrier.inject(tracer)
+
   var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
@@ -104,8 +106,7 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
     // TODO: Write a cleaner abstraction
     val track: Payload => Track = Track(waypoints: _*)
     val child: Span = Spanning(tracer, track, Spanning.messageClassIsOperation, Spanning.akkaProducer(span): _*)
-    val p: Payload = TextMapCarrier.inject(tracer, child.context())
-    sender() ! track(p)
+    sender() ! track(child.context())
     child.finish()
   }
 }
