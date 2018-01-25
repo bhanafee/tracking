@@ -2,7 +2,7 @@ package com.example.track
 
 import java.time.Instant
 
-import io.opentracing.{Span, SpanContext, Tracer}
+import io.opentracing.{References, Span, SpanContext, Tracer}
 import io.opentracing.contrib.akka.{Spanned, Spanning, TextMapCarrier, TracingReceive}
 import io.opentracing.contrib.akka.TextMapCarrier.{Payload, Traceable}
 
@@ -49,6 +49,7 @@ object Tracker {
 
 import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingReceive
+import Spanned.Modifier
 import Tracker.{Waypoint, Query, Track, Tag}
 
 class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
@@ -102,11 +103,17 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   // TODO: write tagMatch function
   private def tagMatch(tags: Seq[Tag]): Waypoint => Boolean = _ => true
 
+  val sendModifiers: Seq[Modifier] = Seq(
+    Spanned.tagAkkaComponent,
+    Spanned.tagProducer,
+    Spanned.timestamp()
+  )
   private def sendTrack(waypoints: Seq[Waypoint]): Unit = {
     // TODO: Write a cleaner abstraction
-    val track: Payload => Track = Track(waypoints: _*)
-    val child: Span = Spanning(tracer, "Track", track, Spanning.akkaProducer(span): _*)
-    sender() ! track(child.context())
+    val parent: Modifier = _.addReference(References.FOLLOWS_FROM, span.context())
+    val modifiers = sendModifiers :+ parent
+    val child: Span = modifiers.foldLeft(tracer.buildSpan("track"))((sb, m) => m(sb)).start()
+    sender() ! Track(waypoints: _*)(child.context())
     child.finish()
   }
 }
