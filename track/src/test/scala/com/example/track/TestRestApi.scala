@@ -26,7 +26,7 @@ class TestRestApi extends WordSpec with Matchers with BeforeAndAfterAll with Sca
     "handle a global query" in {
       Get("/track") ~> route ~> check {
         probe.expectMsg(Query(None, None, List()))
-        probe.reply(Tracker.Track())
+        probe.reply(Tracker.Track()(Map.empty))
         status should be(StatusCodes.OK)
       }
     }

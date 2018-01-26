@@ -3,7 +3,7 @@ package com.example.track
 import java.time.Instant
 
 import io.opentracing.{References, Span, SpanContext, Tracer}
-import io.opentracing.contrib.akka.{Spanned, Spanning, TextMapCarrier, TracingReceive}
+import io.opentracing.contrib.akka.{Spanned, TextMapCarrier, TracingReceive}
 import io.opentracing.contrib.akka.TextMapCarrier.{Payload, Traceable}
 
 object Tracker {
