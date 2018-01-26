@@ -33,23 +33,23 @@ class RestApi(tracker: ActorRef) extends Directives {
         post {
           entity(as[Observation])(handleObservation(_, None))
         } ~ get {
-          onSuccess((tracker ? Tracker.Query(None, None, List())).mapTo[Track]) { result =>
+          onSuccess((tracker ? Tracker.Query(None, None, List())).mapTo[Track]) { result ⇒
             // TODO: Marshall result
             complete(result.toString())
           }
         }
       } ~ {
-        path(Segment) { id =>
+        path(Segment) { id ⇒
           pathEnd {
             get {
-              parameter('since) { since =>
+              parameter('since) { since ⇒
                 // TODO: Parse 'since parameter, return BadRequest if it doesn't parse
-                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result =>
+                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result ⇒
                   // TODO: Marshall result
                   complete(result.toString())
                 }
               } ~ get {
-                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result =>
+                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result ⇒
                   // TODO: Marshall result
                   complete(result.toString())
                 }
@@ -70,9 +70,9 @@ class RestApi(tracker: ActorRef) extends Directives {
     val position = Position(observation.longitude, observation.latitude, observation.elevation)
     Waypoint(id, timestamp, Some(position), observation.tags)
   } match {
-    case Success(w) =>
+    case Success(w) ⇒
       tracker ! w
       complete(StatusCodes.Accepted)
-    case Failure(e) => complete(StatusCodes.BadRequest)
+    case Failure(e) ⇒ complete(StatusCodes.BadRequest)
   }
 }

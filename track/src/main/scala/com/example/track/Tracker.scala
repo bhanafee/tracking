@@ -17,7 +17,7 @@ object Tracker {
     require(longitude >= -180.0 && longitude <= 180.0, "Longitude out of range")
     require(latitude >= -90.0 && latitude <= 90.0, "Latitude out of range")
     // Shore of Dead Sea is -413m and top of Everest is 8848m
-    require(elevation.forall(e => e >= -500.0 && e <= 9000.0), "Elevation out of range")
+    require(elevation.forall(e ⇒ e >= -500.0 && e <= 9000.0), "Elevation out of range")
   }
 
   case class Waypoint(id: String, timestamp: Instant, position: Option[Position], tags: List[Tag]) {
@@ -55,29 +55,29 @@ import Tracker.{Waypoint, Query, Track, Tag}
 class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   override def operation(): String = self.path.name
 
-  implicit val spanContext2payload: SpanContext => Payload = TextMapCarrier.inject(tracer)
+  implicit val spanContext2payload: SpanContext ⇒ Payload = TextMapCarrier.inject(tracer)
 
   var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
     TracingReceive(this, self) {
-      case Waypoint(_, _, None, List()) =>
+      case Waypoint(_, _, None, List()) ⇒
         log.warning("Ignoring empty waypoint")
-      case w: Waypoint =>
+      case w: Waypoint ⇒
         waypoints = waypoints match {
-          case Seq() =>
+          case Seq() ⇒
             log.debug(s"Accepting first waypoint $w")
             Seq(w)
-          case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) =>
+          case Seq(head, _*) if head.timestamp.isBefore(w.timestamp) ⇒
             log.debug(s"Accepting additional waypoint $w")
             w +: waypoints
-          case ws =>
+          case ws ⇒
             log.debug(s"Accepting out of order waypoint $w")
             // TODO: partition and insert waypoints received out of time sequence
             ???
         }
 
-      case Query(qid, None, tags) =>
+      case Query(qid, None, tags) ⇒
         log.debug(s"Querying latest by id $qid and tags $tags")
         val latestMatch = waypoints
           .filter(idMatch(qid))
@@ -85,7 +85,7 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
           .toSeq
         sendTrack(latestMatch)
 
-      case Query(qid, Some(since), tags) =>
+      case Query(qid, Some(since), tags) ⇒
         log.debug(s"Querying by id $qid and tags $tags since $since")
         val matches = waypoints
           .filter(idMatch(qid))
@@ -95,13 +95,13 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
     }
   }
 
-  private def idMatch(qid: Option[String]): Waypoint => Boolean = qid match {
-    case Some(id) => _.id == id
-    case None => _ => true
+  private def idMatch(qid: Option[String]): Waypoint ⇒ Boolean = qid match {
+    case Some(id) ⇒ _.id == id
+    case None ⇒ _ ⇒ true
   }
 
   // TODO: write tagMatch function
-  private def tagMatch(tags: Seq[Tag]): Waypoint => Boolean = _ => true
+  private def tagMatch(tags: Seq[Tag]): Waypoint ⇒ Boolean = _ ⇒ true
 
   val sendModifiers: Seq[Modifier] = Seq(
     Spanned.tagAkkaComponent,
@@ -112,7 +112,7 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
     // TODO: Write a cleaner abstraction
     val parent: Modifier = _.addReference(References.FOLLOWS_FROM, span.context())
     val modifiers = sendModifiers :+ parent
-    val child: Span = modifiers.foldLeft(tracer.buildSpan("track"))((sb, m) => m(sb)).start()
+    val child: Span = modifiers.foldLeft(tracer.buildSpan("track"))((sb, m) ⇒ m(sb)).start()
     sender() ! Track(waypoints: _*)(child.context())
     child.finish()
   }
