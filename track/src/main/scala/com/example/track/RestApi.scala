@@ -10,9 +10,10 @@ import akka.pattern.ask
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.example.track.Tracker._
+import io.opentracing.contrib.akka.TextMapCarrier.Payload
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class RestApi(tracker: ActorRef) extends Directives {
@@ -27,13 +28,15 @@ class RestApi(tracker: ActorRef) extends Directives {
 
   implicit val trackerTimeout: Timeout = 1.seconds
 
+  val NoTrace: Payload = Map.empty
+
   val route: Route = logRequest("tracker") {
     pathPrefix("track") {
       pathEndOrSingleSlash {
         post {
           entity(as[Observation])(handleObservation(_, None))
         } ~ get {
-          onSuccess((tracker ? Tracker.Query(None, None, List())).mapTo[Track]) { result ⇒
+          onSuccess((tracker ? Tracker.Query(None, None, List())(NoTrace)).mapTo[Track]) { result ⇒
             // TODO: Marshall result
             complete(result.toString())
           }
@@ -44,12 +47,12 @@ class RestApi(tracker: ActorRef) extends Directives {
             get {
               parameter('since) { since ⇒
                 // TODO: Parse 'since parameter, return BadRequest if it doesn't parse
-                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result ⇒
+                onSuccess((tracker ? Tracker.Query(Some(id), None, List())(NoTrace)).mapTo[Track]) { result ⇒
                   // TODO: Marshall result
                   complete(result.toString())
                 }
               } ~ get {
-                onSuccess((tracker ? Tracker.Query(Some(id), None, List())).mapTo[Track]) { result ⇒
+                onSuccess((tracker ? Tracker.Query(Some(id), None, List())(NoTrace)).mapTo[Track]) { result ⇒
                   // TODO: Marshall result
                   complete(result.toString())
                 }
@@ -68,7 +71,7 @@ class RestApi(tracker: ActorRef) extends Directives {
     val id: String = observation.id.getOrElse(path.get)
     val timestamp: Instant = observation.timestamp.getOrElse(Instant.now())
     val position = Position(observation.longitude, observation.latitude, observation.elevation)
-    Waypoint(id, timestamp, Some(position), observation.tags)
+    Waypoint(id, timestamp, Some(position), observation.tags)(NoTrace)
   } match {
     case Success(w) ⇒
       tracker ! w

@@ -2,8 +2,7 @@ package com.example.track
 
 import java.time.Instant
 
-import io.opentracing.{References, Span, SpanContext, Tracer}
-import io.opentracing.contrib.akka.{Spanned, TextMapCarrier, TracingReceive}
+import io.opentracing.contrib.akka.ActorTracing
 import io.opentracing.contrib.akka.TextMapCarrier.{Payload, Traceable}
 
 object Tracker {
@@ -11,8 +10,10 @@ object Tracker {
   type Latitude = Double
   type Meters = Float
 
+  /** Used with Waypoint */
   case class Tag(key: String, value: Option[String])
 
+  /** Used with Waypoint */
   case class Position(longitude: Longitude, latitude: Latitude, elevation: Option[Meters]) {
     require(longitude >= -180.0 && longitude <= 180.0, "Longitude out of range")
     require(latitude >= -90.0 && latitude <= 90.0, "Latitude out of range")
@@ -20,28 +21,37 @@ object Tracker {
     require(elevation.forall(e ⇒ e >= -500.0 && e <= 9000.0), "Elevation out of range")
   }
 
-  case class Waypoint(id: String, timestamp: Instant, position: Option[Position], tags: List[Tag]) {
+  /** Identifies the location of an identified object at a point in time. */
+  case class Waypoint(id: String, timestamp: Instant, position: Option[Position], tags: List[Tag])
+                     (val trace: Payload) extends Traceable {
     require(id.nonEmpty)
   }
 
+  /** Convenience constructors */
   object Waypoint {
-    def apply(id: String, timestamp: Instant, position: Position) = new Waypoint(id, timestamp, Some(position), List())
+    def apply(id: String, timestamp: Instant, position: Position)(trace: Payload) =
+      new Waypoint(id, timestamp, Some(position), List())(trace)
 
-    def apply(id: String, timestamp: Instant, tags: List[Tag]) = new Waypoint(id, timestamp, None, tags)
+    def apply(id: String, timestamp: Instant, tags: List[Tag])(trace: Payload) =
+      new Waypoint(id, timestamp, None, tags)(trace)
   }
 
+  /** Inquiry message carrying optional query parameters. */
   case class Query(id: Option[String], since: Option[Instant], tags: List[Tag])
+                  (val trace: Payload) extends Traceable
 
+  /** Convenience constructors */
   object Query {
-    def apply(id: String, since: Instant) = new Query(Some(id), Some(since), List())
+    def apply(id: String, since: Instant)(trace: Payload) = new Query(Some(id), Some(since), List())(trace)
 
-    def apply(id: String) = new Query(Some(id), None, List())
+    def apply(id: String)(trace: Payload) = new Query(Some(id), None, List())(trace)
 
-    def apply(since: Instant, tags: List[Tag]) = new Query(None, Some(since), tags)
+    def apply(since: Instant, tags: List[Tag])(trace: Payload) = new Query(None, Some(since), tags)(trace)
 
-    def apply(since: Instant) = new Query(None, Some(since), List())
+    def apply(since: Instant)(trace: Payload) = new Query(None, Some(since), List())(trace)
   }
 
+  /** Message containing a sequence of waypoints */
   case class Track(waypoints: Waypoint*)
                   (val trace: Payload) extends Traceable
 
@@ -49,18 +59,16 @@ object Tracker {
 
 import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingReceive
-import Spanned.Modifier
-import Tracker.{Waypoint, Query, Track, Tag}
+import com.example.track.Tracker.{Query, Tag, Track, Waypoint}
+import io.opentracing.Tracer
+import io.opentracing.contrib.akka.TracingReceive
 
-class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
-  override def operation(): String = self.path.name
-
-  implicit val spanContext2payload: SpanContext ⇒ Payload = TextMapCarrier.inject(tracer)
+class Tracker(val tracer: Tracer) extends Actor with ActorLogging with ActorTracing {
 
   var waypoints: Seq[Waypoint] = Seq.empty
 
   override def receive = LoggingReceive {
-    TracingReceive(this, self) {
+    TracingReceive(this) {
       case Waypoint(_, _, None, List()) ⇒
         log.warning("Ignoring empty waypoint")
       case w: Waypoint ⇒
@@ -83,7 +91,9 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
           .filter(idMatch(qid))
           .find(tagMatch(tags))
           .toSeq
-        sendTrack(latestMatch)
+        trace("track") { child ⇒
+          sender() ! Track(waypoints: _*)(child)
+        }
 
       case Query(qid, Some(since), tags) ⇒
         log.debug(s"Querying by id $qid and tags $tags since $since")
@@ -91,10 +101,16 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
           .filter(idMatch(qid))
           .takeWhile(_.timestamp.isAfter(since))
           .filter(tagMatch(tags))
-        sendTrack(matches)
+        trace("track") { child ⇒
+          sender() ! Track(matches: _*)(child)
+        }
     }
   }
 
+  /**
+    * Returns whether a waypoint id matches a given id.
+    * @param qid the id to match. `None` always returns true``
+    */
   private def idMatch(qid: Option[String]): Waypoint ⇒ Boolean = qid match {
     case Some(id) ⇒ _.id == id
     case None ⇒ _ ⇒ true
@@ -103,17 +119,4 @@ class Tracker(val tracer: Tracer) extends Actor with ActorLogging with Spanned {
   // TODO: write tagMatch function
   private def tagMatch(tags: Seq[Tag]): Waypoint ⇒ Boolean = _ ⇒ true
 
-  val sendModifiers: Seq[Modifier] = Seq(
-    Spanned.tagAkkaComponent,
-    Spanned.tagProducer,
-    Spanned.timestamp()
-  )
-  private def sendTrack(waypoints: Seq[Waypoint]): Unit = {
-    // TODO: Write a cleaner abstraction
-    val parent: Modifier = _.addReference(References.FOLLOWS_FROM, span.context())
-    val modifiers = sendModifiers :+ parent
-    val child: Span = modifiers.foldLeft(tracer.buildSpan("track"))((sb, m) ⇒ m(sb)).start()
-    sender() ! Track(waypoints: _*)(child.context())
-    child.finish()
-  }
 }

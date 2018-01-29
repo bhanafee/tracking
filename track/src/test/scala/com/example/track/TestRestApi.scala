@@ -6,10 +6,12 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import com.example.track.Tracker.{Query, Waypoint}
+import io.opentracing.contrib.akka.TextMapCarrier.Payload
 
 import scala.concurrent.duration._
 
 class TestRestApi extends WordSpec with Matchers with BeforeAndAfterAll with ScalatestRouteTest {
+  val DummyPayload: Payload = Map.empty
 
   private val Timeout = 500.milliseconds
 
@@ -25,7 +27,7 @@ class TestRestApi extends WordSpec with Matchers with BeforeAndAfterAll with Sca
     }
     "handle a global query" in {
       Get("/track") ~> route ~> check {
-        probe.expectMsg(Query(None, None, List()))
+        probe.expectMsg(Query(None, None, List())(DummyPayload))
         probe.reply(Tracker.Track()(Map.empty))
         status should be(StatusCodes.OK)
       }
