@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.maybeitssquid.web.controllers;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;

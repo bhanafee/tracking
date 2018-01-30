@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.maybeitssquid.web;
 
 import brave.opentracing.BraveTracer;
 import io.opentracing.Tracer;

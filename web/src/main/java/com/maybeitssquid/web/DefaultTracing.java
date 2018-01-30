@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.maybeitssquid.web;
 
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;

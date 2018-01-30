@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.maybeitssquid.web.controllers;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
