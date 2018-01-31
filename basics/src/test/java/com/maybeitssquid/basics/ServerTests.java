@@ -1,4 +1,4 @@
-package com.example.basics;
+package com.maybeitssquid.basics;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

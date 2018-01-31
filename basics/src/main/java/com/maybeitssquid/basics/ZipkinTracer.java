@@ -1,4 +1,4 @@
-package com.example.basics;
+package com.maybeitssquid.basics;
 
 import brave.opentracing.BraveTracer;
 import io.opentracing.Tracer;

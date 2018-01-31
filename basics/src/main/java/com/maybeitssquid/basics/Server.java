@@ -1,4 +1,4 @@
-package com.example.basics;
+package com.maybeitssquid.basics;
 
 import io.opentracing.Scope;
 import io.opentracing.Span;
