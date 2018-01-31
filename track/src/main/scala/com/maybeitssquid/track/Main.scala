@@ -1,4 +1,4 @@
-package com.example.track
+package com.maybeitssquid.track
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.Http

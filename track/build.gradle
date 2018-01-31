@@ -26,4 +26,4 @@ dependencies {
     )
 }
 
-mainClassName = "com.example.track.Main"
+mainClassName = "com.maybitssquid.track.Main"

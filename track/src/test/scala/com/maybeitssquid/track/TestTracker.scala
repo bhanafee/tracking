@@ -1,4 +1,4 @@
-package com.example.track
+package com.maybeitssquid.track
 
 import java.time.Instant
 
@@ -7,6 +7,8 @@ import akka.pattern.ask
 import akka.testkit.{TestActorRef, TestKit}
 import akka.util.Timeout
 import com.example.track.Tracker.{Position, Tag, Track, Waypoint}
+import com.maybeitssquid.track
+import com.maybeitssquid.track.Tracker.{Position, Tag, Track}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import io.opentracing.contrib.akka.TextMapCarrier.Payload
 
@@ -56,7 +58,7 @@ class TestTracker extends TestKit(ActorSystem("TestTracker")) with WordSpecLike 
       "send the most recent by id" in {
         val test = TestActorRef[Tracker]
         test ! Waypoint("id", Instant.now(), Somewhere, No_Tags)(DummyPayload)
-        val future = test ? com.example.track.Tracker.Query("id")(DummyPayload)
+        val future = test ? track.Tracker.Query("id")(DummyPayload)
         val result = future.value.get.get.asInstanceOf[Track]
         result.waypoints.length should be(1)
         result.waypoints.head.id should be("id")

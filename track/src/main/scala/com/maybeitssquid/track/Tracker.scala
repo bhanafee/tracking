@@ -1,4 +1,4 @@
-package com.example.track
+package com.maybeitssquid.track
 
 import java.time.Instant
 
@@ -59,7 +59,7 @@ object Tracker {
 
 import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingReceive
-import com.example.track.Tracker.{Query, Tag, Track, Waypoint}
+import Tracker.{Query, Tag, Track, Waypoint}
 import io.opentracing.Tracer
 import io.opentracing.contrib.akka.TracingReceive
 

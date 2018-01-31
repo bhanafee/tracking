@@ -1,4 +1,4 @@
-package com.example.track
+package com.maybeitssquid.track
 
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.{TestKit, TestProbe}
@@ -6,6 +6,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import com.example.track.Tracker.{Query, Waypoint}
+import com.maybeitssquid.track.Tracker.Waypoint
 import io.opentracing.contrib.akka.TextMapCarrier.Payload
 
 import scala.concurrent.duration._

@@ -1,4 +1,4 @@
-package com.example.track
+package com.maybeitssquid.track
 
 import java.time.Instant
 
@@ -9,7 +9,7 @@ import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
 import akka.pattern.ask
 import akka.stream.Materializer
 import akka.util.Timeout
-import com.example.track.Tracker._
+import Tracker._
 import io.opentracing.contrib.akka.TextMapCarrier.Payload
 
 import scala.concurrent.duration._
