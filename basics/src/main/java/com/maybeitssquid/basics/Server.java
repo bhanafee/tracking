@@ -1,6 +1,7 @@
 package com.maybeitssquid.basics;
 
-import io.opentracing.Scope;
+import com.maybeitssquid.basics.model.BuiltIns;
+import com.maybeitssquid.basics.model.LocalizedFind;
 import io.opentracing.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

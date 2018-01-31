@@ -1,4 +1,4 @@
-package com.maybeitssquid.basics;
+package com.maybeitssquid.basics.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -1,4 +1,4 @@
-package com.maybeitssquid.basics;
+package com.maybeitssquid.basics.model;
 
 import java.util.*;
 import java.util.Currency;
