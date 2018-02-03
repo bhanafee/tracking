@@ -1,7 +1,6 @@
 package com.maybeitssquid.basics.model;
 
 import java.util.*;
-import java.util.Currency;
 import java.util.regex.Pattern;
 
 /**
@@ -59,9 +58,9 @@ public class BuiltIns {
      *
      * @return currency info matching the code.
      */
-    public static LocalizedFind<java.util.Currency> findCurrency() {
+    public static LocalizedFind<Currency> findCurrency() {
         return (code, locale) -> {
-            Optional<java.util.Currency> currency = Optional.empty();
+            Optional<Currency> currency = Optional.empty();
             if (Numeric.matcher(code).matches()) {
                 int numeric = Integer.parseInt(code);
                 for (java.util.Currency c : AVAILABLE_CURRENCIES) {
@@ -125,7 +124,7 @@ public class BuiltIns {
         }
 
         @Override
-        public java.util.Currency getCurrency() {
+        public Currency getCurrency() {
             try {
                 final java.util.Currency fromJRE = java.util.Currency.getInstance(wrapped);
                 return fromJRE == null ? null : new CurrencyFromJRE(fromJRE, localized);
