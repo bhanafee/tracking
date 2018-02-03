@@ -1,4 +1,4 @@
-name := """queries"""
+name := """admin"""
 organization := "com.example"
 
 version := "0.0.1-SNAPSHOT"
