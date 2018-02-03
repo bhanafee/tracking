@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.testkit.{TestActorRef, TestKit}
 import akka.util.Timeout
-import com.example.track.Tracker.{Position, Tag, Track, Waypoint}
+import com.maybeitssquid.track.Tracker.{Position, Tag, Track, Waypoint}
 import com.maybeitssquid.track
 import com.maybeitssquid.track.Tracker.{Position, Tag, Track}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
