@@ -22,7 +22,7 @@ dependencies {
     compile(
             "org.springframework.data:spring-data-rest-hal-browser",
             "org.springframework.boot:spring-boot-starter",
-            "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}",
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     )
     testCompile "org.springframework.boot:spring-boot-starter-test"
