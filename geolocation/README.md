@@ -13,14 +13,6 @@ Queries and tags a location based on a geolocation database
 
 - Longitude/latitude -> areas
 
-## Tasks supported
-
-- Acquire TIGER shapefiles
-- Load shapefiles
-- Load CSV-formatted localization data
-- Explore database
-
-
 # Cloud environments
 
 ## Docker
@@ -37,14 +29,17 @@ docker build geolocation/db -f geolocation/db/Dockerfile.tiger --tag tracking/ti
 Build the DB itself. This is a multi-stage build.
 
 1. Mount the TIGER data from above
+   - Unzip the shapefiles
 2. Build the database
    - Create the DB and schema
    - Enable the PostGIS extension
-   - For each TIGER file
-     - Unzip the file
-     - Use `pgsql` to transform it to loadable PSQL
-     - Load the data
-3. Create the final image with just the DB
+   - For each TIGER shapefile
+     - Copy the data to a working directory
+     - Use `shp2pgsql` to transform it for `pgsql`
+     - Load the data to an intermediate schema
+     - Insert into the final schema
+   - Drop the intermediate schema
+3. Create a new image with just the final DB schema
 
 ```bash
 docker build geolocation/db --tag tracking/db

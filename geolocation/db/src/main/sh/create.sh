@@ -10,3 +10,5 @@ CREATE EXTENSION postgis;
 CREATE SCHEMA tiger;
 CREATE SCHEMA areas;
 EOF
+
+pg_ctl -D /data stop
