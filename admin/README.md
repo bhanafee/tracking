@@ -10,10 +10,6 @@ Administer and explore the other services.
 - Tracing
 - JPA
 
-## Queries supported
-
-- Longitude/latitude -> areas
-
 # Cloud environments
 
 ## Docker

@@ -1,0 +1,31 @@
+# Builds a docker image that downloads TIGER shapefiles from US census bureau.
+FROM busybox
+# Version (year) of shapefiles to retrieve
+ENV version 2017
+LABEL TIGER ${version}
+WORKDIR /tiger
+
+# State boundaries
+
+RUN wget https://www2.census.gov/geo/tiger/TIGER${version}/STATE/tl_${version}_us_state.zip; \
+unzip tl_${version}_us_state; \
+rm tl_${version}_us_state.zip
+
+# county boundaries
+
+RUN wget https://www2.census.gov/geo/tiger/TIGER${version}/COUNTY/tl_${version}_us_county.zip; \
+unzip tl_${version}_us_county; \
+rm tl_${version}_us_county.zip
+
+# congressional districts
+
+# Which meeting of congressional districts, changes every 2 years
+ENV congress 115
+RUN wget https://www2.census.gov/geo/tiger/TIGER${version}/CD/tl_${version}_us_cd${congress}.zip; \
+unzip tl_${version}_us_cd${congress}; \
+rm tl_${version}_us_cd${congress}.zip
+
+# ZIP code tabulation areas (2010 census)
+RUN wget https://www2.census.gov/geo/tiger/TIGER${version}/ZCTA5/tl_${version}_us_zcta510.zip; \
+unzip tl_${version}_us_zcta510; \
+rm tl_${version}_us_zcta510.zip
