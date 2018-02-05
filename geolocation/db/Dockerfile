@@ -36,6 +36,9 @@ WORKDIR /shapefiles
 RUN /scripts/load.sh ${version} ${congress} ${census}
 RUN /scripts/transform.sh
 RUN /scripts/clean.sh
+
 #
 # Create an image with only the DB
 #
+FROM mdillon/postgis
+COPY --from=1 /data/ /data/
