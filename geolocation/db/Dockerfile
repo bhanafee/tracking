@@ -10,7 +10,7 @@ ENV census 10
 WORKDIR /tiger
 # PostGIS base image doesn't unzip
 RUN unzip tl_${version}_us_state
-#RUN unzip tl_${version}_us_county
+RUN unzip tl_${version}_us_county
 #RUN unzip tl_${version}_us_cd${congress}
 #RUN unzip tl_${version}_us_zcta5${census}
 
@@ -32,6 +32,7 @@ RUN /scripts/create.sh
 
 # Unpack, transform and load the shapefiles
 COPY --from=0 /tiger/*state* /shapefiles/
+COPY --from=0 /tiger/*county* /shapefiles/
 WORKDIR /shapefiles
 RUN /scripts/load.sh ${version} ${congress} ${census}
 RUN /scripts/transform.sh
