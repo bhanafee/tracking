@@ -31,14 +31,14 @@ Build the DB itself. This is a multi-stage build.
 1. Mount the TIGER data from above
    - Unzip the shapefiles
 2. Build the database
-   - Create the DB and schema
-   - Enable the PostGIS extension
-   - For each TIGER shapefile
-     - Copy the data to a working directory
-     - Use `shp2pgsql` to transform it for `pgsql`
+   - Add the scripts
+   - Copy the TIGER shapefiles
+   - Generate load scripts using `shp2pgsql`
+   - Initialize the database, which runs the scripts
+     - Create the database and schema with PostGIS extensions
      - Load the data to an intermediate schema
-     - Insert into the final schema
-   - Drop the intermediate schema
+     - Insert the data into the final schema
+     - Drop the intermediate schema and vacuum the database
 3. Create a new image with just the final DB schema
 
 ```bash

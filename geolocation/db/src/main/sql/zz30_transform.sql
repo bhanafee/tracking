@@ -1,10 +1,3 @@
-#!/bin/bash
-set -e
-
-pg_ctl -D /data start
-
-psql <<EOF
-\c locator
 CREATE TABLE areas.monitored (
   tiger VARCHAR(20),
   abbrev CHAR(2),
@@ -13,10 +6,7 @@ CREATE TABLE areas.monitored (
 INSERT INTO areas.monitored (tiger, abbrev, name, geom)
   SELECT s.geoid, s.stusps, s.name, s.geom
   FROM tiger.states AS s;
-INSERT INTO areas.monitored (tiger, name, geom)
-  SELECT c.geoid, c.name, c.geom
-  FROM tiger.counties AS c;
+-- INSERT INTO areas.monitored (tiger, name, geom)
+--   SELECT c.geoid, c.name, c.geom
+--   FROM tiger.counties AS c;
 CREATE INDEX idx_monitored_geom ON areas.monitored USING gist(geom);
-EOF
-
-pg_ctl -D /data stop

@@ -8,11 +8,12 @@ ENV congress 115
 # Which census decade, affects shapefile names
 ENV census 10
 WORKDIR /tiger
-# PostGIS base image doesn't unzip
-RUN unzip tl_${version}_us_state
-RUN unzip tl_${version}_us_county
-#RUN unzip tl_${version}_us_cd${congress}
-#RUN unzip tl_${version}_us_zcta5${census}
+# PostGIS base image doesn't include unzip
+RUN mkdir unzipped
+RUN unzip tl_${version}_us_state -d unzipped
+#RUN unzip tl_${version}_us_county -d unzipped
+#RUN unzip tl_${version}_us_cd${congress} -d unzipped
+#RUN unzip tl_${version}_us_zcta5${census} -d unzipped
 
 #
 # Configure and load the database
@@ -21,25 +22,21 @@ FROM mdillon/postgis
 ENV version 2017
 ENV congress 115
 ENV census 10
-ADD src/main/sh/*.sh /scripts/
-
-# Set up the database in /data
-WORKDIR /data
-RUN chown postgres:postgres /data
-USER postgres
-RUN initdb -A trust -D /data
-RUN /scripts/create.sh
+ADD src/main/sh/   /scripts/
+ADD src/main/sql/  /docker-entrypoint-initdb.d/
 
 # Unpack, transform and load the shapefiles
-COPY --from=0 /tiger/*state* /shapefiles/
-COPY --from=0 /tiger/*county* /shapefiles/
+COPY --from=0 /tiger/unzipped/ /shapefiles
 WORKDIR /shapefiles
-RUN /scripts/load.sh ${version} ${congress} ${census}
-RUN /scripts/transform.sh
-RUN /scripts/clean.sh
+RUN /scripts/load.sh /docker-entrypoint-initdb.d ${version} ${congress} ${census}
+USER postgres
+
+# Set up the database
+RUN /usr/local/bin/docker-entrypoint.sh postgres --single
 
 #
 # Create an image with only the DB
 #
 FROM mdillon/postgis
-COPY --from=1 /data/ /data/
+USER postgres
+COPY --from=1 ${PGDATA}/ ${PGDATA}
