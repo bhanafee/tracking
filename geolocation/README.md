@@ -58,7 +58,7 @@ docker run mdillon/postgis --mount src=trackingdb,target=/var/lib/postgresql/dat
 ### Build the Application
 
 ```bash
-gradle basics:bootJar
-docker build geolocation --tag tracking/geolocation
+gradle geolocation:app:bootJar
+docker build geolocation/app --tag tracking/geolocation
 docker run -p 8080:8080 tracking/geolocation
 ```

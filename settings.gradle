@@ -1,3 +1,3 @@
 rootProject.name = 'cloud'
 
-include 'basics', 'opentracing-akka', 'track', 'web', 'geolocation', 'admin'
+include 'basics', 'opentracing-akka', 'track', 'web', 'geolocation:app', 'admin'
