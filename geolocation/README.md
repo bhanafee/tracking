@@ -19,30 +19,40 @@ Queries and tags a location based on a geolocation database
 
 ### Build the PostGIS Database
 
-This step downloads the TIGER shapefiles from the US Census web site. Once built, it only needs to be updated yearly
-when the Census Bureau updates the data. 
+The PostGIS database is built from TIGER geographic data the US census site. The first step is to download the
+shapefiles to a local volume. Once built, it only needs to be updated yearly when the Census Bureau updates the data.
 
 ```bash
-docker build geolocation/db -f geolocation/db/Dockerfile.tiger --tag tracking/tiger
+docker build geolocation/db --file geolocation/db/Dockerfile.gisdata --tag tracking/gisdata
+docker build geolocation/db --file geolocation/db/Dockerfile.db --tag tracking/db
 ```
 
-Build the DB itself. This is a multi-stage build.
+The `gisdata` container uses the following `ENV` variables:
 
-1. Mount the TIGER data from above
-   - Unzip the shapefiles
-2. Build the database
-   - Add the scripts
-   - Copy the TIGER shapefiles
-   - Generate load scripts using `shp2pgsql`
-   - Initialize the database, which runs the scripts
-     - Create the database and schema with PostGIS extensions
-     - Load the data to an intermediate schema
-     - Insert the data into the final schema
-     - Drop the intermediate schema and vacuum the database
-3. Create a new image with just the final DB schema
+| Name     | Value | Description         |
+|----------|------:|---------------------|
+| YEAR     |  2017 | Shapefile version   |
+| CONGRESS |   115 | Meeting of Congress |
+| CENSUS   |    10 | 2010 census         |
+
+
+The database is built as follows:
+1. Create a `gisdata` volume for the raw GIS data
+2. Download the GIS data
+3. Create a `trackingdb` volume for the PostGIS database
+4. Create and load the database
 
 ```bash
-docker build geolocation/db --tag tracking/db
+docker volume create gisdata
+docker run --mount src=gisdata,target=/gisdata tracking/gisdata
+docker volume create trackingdb
+docker run --mount src=gisdata,target=/gisdata --mount src=trackingdb,target=/var/lib/postgresql/data tracking/db
+```
+
+Once built, the GIS database can be run using the basic PostGIS docker container
+
+```
+docker run mdillon/postgis --mount src=trackingdb,target=/var/lib/postgresql/data
 ```
 
 ### Build the Application
