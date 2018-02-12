@@ -3,4 +3,5 @@ VOLUME /gisdata
 ENV YEAR=2017 CONGRESS=115 CENSUS=10
 LABEL description="Dowload TIGER shapefiles to gisdata volume"
 COPY src/main/sh/download.sh /download.sh
+WORKDIR /gisdata
 CMD /download.sh ${YEAR} ${CONGRESS} ${CENSUS}
