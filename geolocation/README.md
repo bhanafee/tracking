@@ -23,8 +23,8 @@ The PostGIS database is built from TIGER geographic data the US census site. The
 shapefiles to a local volume. Once built, it only needs to be updated yearly when the Census Bureau updates the data.
 
 ```bash
-docker build geolocation/db --file geolocation/db/Dockerfile.gisdata --tag tracking/gisdata
-docker build geolocation/db --file geolocation/db/Dockerfile.db --tag tracking/db
+docker build --file geolocation/db/Dockerfile.gisdata --tag tracking/gisdata geolocation/db
+docker build --file geolocation/db/Dockerfile.db --tag tracking/db geolocation/db
 ```
 
 The `gisdata` container uses the following `ENV` variables:
@@ -46,13 +46,19 @@ The database is built as follows:
 docker volume create gisdata
 docker run --mount src=gisdata,target=/gisdata tracking/gisdata
 docker volume create trackingdb
-docker run --mount src=gisdata,target=/gisdata --mount src=trackingdb,target=/var/lib/postgresql/data tracking/db
+docker run --mount src=gisdata,target=/gisdata --mount src=trackingdb,target=/var/lib/postgresql/data tracking/db --single
 ```
 
-Once built, the GIS database can be run using the basic PostGIS docker container
+Once built, the GIS database can be opened using the basic PostGIS docker container
 
+```bash
+docker run --mount src=trackingdb,target=/var/lib/postgresql/data --publish 5432:5432 mdillon/postgis
 ```
-docker run mdillon/postgis --mount src=trackingdb,target=/var/lib/postgresql/data
+
+For testing, you can connect to the database using psql
+
+```bash
+psql postgresql://localhost:5432 -U postgres
 ```
 
 ### Build the Application
