@@ -2,9 +2,6 @@ FROM mdillon/postgis
 # Source of TIGER data
 VOLUME /gisdata
 ENV SCRIPTS=/docker-entrypoint-initdb.d/ STAGE=/stage
+RUN mkdir ${STAGE} && chmod 777 ${STAGE}
 ADD src/main/sh/stage.sh ${SCRIPTS}
 ADD src/main/sql/* ${SCRIPTS}
-# Make sure these exist. Runtime will append to zdata.sql
-RUN mkdir -m 777 ${STAGE} && \
-    touch ${SCRIPTS}zdata.sql && \
-    chmod 666 ${SCRIPTS}zdata.sql
