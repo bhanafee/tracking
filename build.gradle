@@ -9,21 +9,21 @@ allprojects {
 	apply plugin: 'project-report'
 	buildscript {
 		ext {
-            akkaHttpVersion = '10.0.11'
-            akkaVersion = '2.5.9'
-            kotlinVersion = '1.2.20'
+            akkaHttpVersion = '10.1.1'
+            akkaVersion = '2.5.12'
+            kotlinVersion = '1.2.41'
             logbackVersion = '1.2.3'
             lombokVersion = '1.16.20'
-            zipkinReporterVersion = '2.3.1'
-            opentracingBraveVersion = '0.26.0'
+            zipkinReporterVersion = '2.6.1'
+            opentracingBraveVersion = '0.31.0'
             opentracingVersion = '0.31.0'
-            playVersion = '2.6.11'
-            reactorVersion = '3.1.3.RELEASE'
+            playVersion = '2.6.13'
+            reactorVersion = '3.1.7.RELEASE'
             scalaLibVersion = '2.12'
-            scalaTestVersion = '3.0.4'
-            scalaVersion = '2.12.4'
+            scalaTestVersion = '3.0.5'
+            scalaVersion = '2.12.6'
             slf4jVersion = '1.7.25'
-            springBootVersion = '2.0.0.RC1'
+            springBootVersion = '2.0.2.RELEASE'
 		}
 		repositories {
 			mavenCentral()
