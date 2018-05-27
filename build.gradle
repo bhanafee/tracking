@@ -1,8 +1,8 @@
-group = 'com.example'
+group = 'com.maybeitssquid.tracking'
 version = '0.0.1-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.5'
+    gradleVersion = '4.7'
 }
 
 allprojects {
