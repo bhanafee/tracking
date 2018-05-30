@@ -14,9 +14,12 @@ dependencies {
     compile(
             "org.springframework.boot:spring-boot-starter-web",
             "org.springframework.boot:spring-boot-starter-jdbc",
-            "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}",
-            "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
+            "com.fasterxml.jackson.module:jackson-module-kotlin",
+            "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
     )
-    runtime('org.postgresql:postgresql')
+    runtime(
+            "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}",
+             "org.postgresql:postgresql"
+    )
     testCompile "org.springframework.boot:spring-boot-starter-test"
 }

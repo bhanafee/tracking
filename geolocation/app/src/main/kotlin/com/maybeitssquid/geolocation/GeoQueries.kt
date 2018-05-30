@@ -5,7 +5,7 @@ package com.maybeitssquid.geolocation
  * @param tag the type of area
  * @param name the name of the area
  */
-data class Area(val tag: String, val name: String)
+data class Area(val tag: String, val id: String, val description: String)
 
 /**
  * Longitude/Latitude coordinate
@@ -18,5 +18,5 @@ interface GeoQueries {
      * @param the point
      * @return the areas that enclose the point
      */
-    fun areas(point: Point): Sequence<Area>
+    fun areas(point: Point): Array<Area>
 }

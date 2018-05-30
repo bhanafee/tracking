@@ -15,6 +15,6 @@ class QueryController(@Autowired val queries: GeoQueries) {
     fun greeting(@RequestParam(value = "longitude") longitude: Double,
                  @RequestParam(value = "latitude") latitude: Double) =
             with(queries) {
-                areas(Point(longitude, latitude))
+                 areas(Point(longitude, latitude))
             }
 }
