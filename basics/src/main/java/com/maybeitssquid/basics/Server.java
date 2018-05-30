@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import javax.validation.constraints.NotNull;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Locale;
@@ -38,8 +39,28 @@ public class Server {
 
     private Tracing tracing;
 
+    /** Generate response for a built-in country. */
+    private final Function<ServerRequest, Mono<ServerResponse>> country = get(BuiltIns.findCountry(), "country");
+
+    /** Generate response for a built-in currency. */
+    private final Function<ServerRequest, Mono<ServerResponse>> currency = get(BuiltIns.findCurrency(), "currency");
+
+    /** Generate response for a built-in language. */
+    private final Function<ServerRequest, Mono<ServerResponse>> language = get(BuiltIns.findLanguage(), "language");
+
+    /** Boot the application. */
     public static void main(String[] args) {
         SpringApplication.run(Server.class, args);
+    }
+
+    /**
+     * Allow the logger to be configured to something other than based on the class name.
+     *
+     * @param log the logger to use.
+     */
+    @Autowired(required = false)
+    public void setLogger(final Logger log) {
+        this.log = log;
     }
 
     /**
@@ -62,6 +83,21 @@ public class Server {
         return route(GET("/countries/{code}"), this::getCountry)
                 .andRoute(GET("/currencies/{code}"), this::getCurrency)
                 .andRoute(GET("/languages/{code}"), this::getLanguage);
+    }
+
+    @NotNull
+    private Mono<ServerResponse> getCountry(ServerRequest request) {
+        return country.apply(request);
+    }
+
+    @NotNull
+    private Mono<ServerResponse> getCurrency(ServerRequest request) {
+        return currency.apply(request);
+    }
+
+    @NotNull
+    private Mono<ServerResponse> getLanguage(ServerRequest request) {
+        return language.apply(request);
     }
 
     private <R> Function<ServerRequest, Mono<ServerResponse>> get(LocalizedFind<R> find, String operation) {
@@ -90,21 +126,6 @@ public class Server {
 
             return span == null ? response : response.doOnTerminate(span::finish);
         };
-    }
-
-    private Mono<ServerResponse> getCountry(ServerRequest request) {
-        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findCountry(), "country");
-        return fn.apply(request);
-    }
-
-    private Mono<ServerResponse> getCurrency(ServerRequest request) {
-        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findCurrency(), "currency");
-        return fn.apply(request);
-    }
-
-    private Mono<ServerResponse> getLanguage(ServerRequest request) {
-        final Function<ServerRequest, Mono<ServerResponse>> fn = get(BuiltIns.findLanguage(), "language");
-        return fn.apply(request);
     }
 
 }
