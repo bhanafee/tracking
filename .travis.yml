@@ -7,3 +7,6 @@ jdk: oraclejdk9
 script:
   - ./gradlew wrapper --version
   - ./gradlew clean
+  - ./gradlew assemble
+  - ./gradlew admin:dist
+  
