@@ -10,7 +10,7 @@ Simple query service. It is a **Reactive Spring** service written in **Java 9** 
 Proxies an external service to get weather reports for specific locations. It is written in **C#** and runs on **.NET Core**
 
 ## [Geolocation](geolocation)
-Service that calculates which geographic areas cover a coordinate. It is a **Kotlin** application built on **Spring REST**, and accesses a **PostGIS** database.
+Service that calculates which geographic areas cover a coordinate. It is a **Kotlin** application built on **Spring JDBC**, and accesses a **PostGIS** database.
 
 ## [Track](track)
 Tracks geographic observations over time. It is written in **Scala** and built on **Akka HTTP**.

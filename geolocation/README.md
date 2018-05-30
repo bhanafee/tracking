@@ -4,10 +4,8 @@ Queries and tags a location based on a geolocation database
 
 ## Technologies
 
-- PostGis
-- Spring REST (HAL)
-- JPA
-- ??
+- PostGIS
+- Spring JDBC
 
 ## Queries supported
 
