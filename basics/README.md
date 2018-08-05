@@ -15,8 +15,10 @@ Provides very basic language and currency information about a locale using Java 
 
 ## Docker
 
+From project root directory
+
 ```bash
-gradle basics:bootJar
+./gradlew basics:bootJar
 docker build basics --tag tracking/basics
 docker run -p 8080:8080 tracking/basics
 ```

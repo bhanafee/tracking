@@ -61,8 +61,10 @@ psql postgresql://localhost:5432 -U postgres
 
 ### Build the Application
 
+From project root directory
+
 ```bash
-gradle geolocation:app:bootJar
+./gradlew geolocation:app:bootJar
 docker build geolocation/app --tag tracking/geolocation
 docker run -p 8080:8080 tracking/geolocation
 ```

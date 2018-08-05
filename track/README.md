@@ -13,8 +13,10 @@ Tracks movement of known devices
 
 ## Docker
 
+From project root directory
+
 ```bash
-gradle track:distTar
+./gradlew track:distTar
 docker build track --tag tracking/track
 docker run -p 8080:8080 tracking/track
 ```

@@ -17,8 +17,10 @@ Secured front end for access to the cloud services
 
 ## Docker
 
+From project root directory
+
 ```bash
-gradle web:bootJar
+./gradlew web:bootJar
 docker build web --tag tracking/web
 docker run -p 8080:8080 tracking/web
 ```
